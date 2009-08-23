@@ -1,0 +1,6 @@
+*.class
+.*.swp
+*~
+*.bak
+gen/*
+bin/*
