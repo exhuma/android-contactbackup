@@ -26,6 +26,9 @@ import android.provider.Contacts.Phones;
 import android.provider.Contacts.Photos;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 
 /**
@@ -45,6 +48,7 @@ public class ContactBackup extends Activity {
 	private static final int DIALOG_PROGRESS = 2;
 	protected static final int DIALOG_FINISHED = 3;
 	private TextView mLogText;
+	private Button mBackupButton;
 
 	ProgressThread progressThread;
 	ProgressDialog progressDialog;
@@ -71,7 +75,7 @@ public class ContactBackup extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		mLogText = (TextView) findViewById(R.id.log);
+		mLogText = (TextView) findViewById(R.id.disclaimer);
 
 		mLogText.setText("--------------------------\n" + "Read this first!\n"
 				+ "--------------------------\n"
@@ -94,6 +98,8 @@ public class ContactBackup extends Activity {
 				+ "can manually edit them, re-import them onto the phone "
 				+ "and then retry syncing.");
 
+		mBackupButton = (Button)findViewById(R.id.backup_button);
+		mBackupButton.setOnClickListener( new BackupListener() );
 	}
 
 	@Override
@@ -472,6 +478,21 @@ public class ContactBackup extends Activity {
 		public void setState(int state) {
 			mState = state;
 		}
+	}
+	
+	private class BackupListener implements OnClickListener{
+
+		@Override
+		public void onClick(View v) {
+			File file1 = null;
+			file1 = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
+			if (file1.exists()) {
+				showDialog(DIALOG_ASK_DELETE);
+			} else {
+				showDialog(DIALOG_PROGRESS);
+			}
+		}
+		
 	}
 
 }
