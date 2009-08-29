@@ -1,0 +1,36 @@
+Usage
+==================================================
+
+   Remember that you accepted
+   the risks that come with
+   using this application!
+
+Creating a dump file
+-----------------------------
+   Click on the button
+   labelled "Save to file".
+   This will create a file
+   called 'contacts.json' on
+   the external storage device
+   (SDCard).
+
+Loading a dump file
+-----------------------------
+ First, place a file called
+ "contacts.json" onto the root
+ folder of the SDCard, next
+ open the application and
+ click on the button labelled
+ "Load from file".
+
+ While loading, the
+ application does not know how
+ many contacts are contained
+ in the file as it is streamed
+ into the contact list. As
+ such, the progress indicator
+ displays the number of
+ characters read from the file
+ instead of the number of
+ contacts.
+

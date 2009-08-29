@@ -1,16 +1,21 @@
 package lu.albert.android.contactbackup;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -28,15 +33,31 @@ public class ContactBackup extends Activity {
 
 	/** The filename that will be stored on disk */
 	public static final String FILE_NAME = "contacts.json";
+	
+	private static final int MENU_EULA = Menu.FIRST;
+	
 	private static final int DIALOG_CONFIRM_OVERWRITE = 0;
 	private static final int DIALOG_CANCELLED = 1;
 	private static final int DIALOG_BACKUP_PROGRESS = 2;
 	protected static final int DIALOG_FINISHED = 3;
 	private static final int DIALOG_RESTORE_PROGRESS = 4;
 	private static final int DIALOG_ERROR = 5;
+	private static final int DIALOG_EULA = 6;
+	
 	protected static final int RESTORE_MSG_PROGRESS = 0;
 	protected static final int RESTORE_MSG_INFO = 1;
-	private TextView mLogText;
+	
+	/** 
+	 * A handler message type for errors. If a message of this kind is
+	 * received, an error message will popup. The message must also contain
+	 * a key with the name "message" containing the message string to be
+	 * displayed.
+	 */
+	public static final int RESTORE_SHOW_ERROR = 2;
+	
+	/** The preferences name */
+	public static final String PREFS_NAME = "lu.albert.android.contactbackup.prefs";
+
 	private Button mBackupButton;
 	private Button mRestoreButton;
 	private BackupThread progressThread;
@@ -83,6 +104,11 @@ public class ContactBackup extends Activity {
 					showDialog(DIALOG_FINISHED);
 				}
 				break;
+			case RESTORE_SHOW_ERROR:
+				String message = msg.getData().getString("message");
+				mErrorDialog.setMessage(message);
+				showDialog(DIALOG_ERROR);
+				break;
 			case RESTORE_MSG_INFO:
 				String name = msg.getData().getString("name");
 				progressDialog.setMessage( "Restored " + name );
@@ -95,34 +121,37 @@ public class ContactBackup extends Activity {
 	};
 
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    menu.add(0, MENU_EULA, 0, "EULA")
+	    	.setIcon(android.R.drawable.ic_dialog_info);
+	    return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    case MENU_EULA:
+	    	showDialog( DIALOG_EULA );
+	        return true;
+	    }
+	    return false;
+	}
+	
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		mLogText = (TextView) findViewById(R.id.disclaimer);
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		if ( !settings.getBoolean("eulaAccepted", false) ){
+			showDialog( DIALOG_EULA );
+		}
+		
+		SharedPreferences.Editor editor = settings.edit();
+	    editor.putBoolean("eulaAccepted", false);
+	    editor.commit();
 
-		// TODO refactor this text out of the code and make it look nicer
-		mLogText.setText("--------------------------\n" + "Read this first!\n"
-				+ "--------------------------\n"
-				+ "If the acronym JSON does not mean anything to you "
-				+ "or you don't do software development then this "
-				+ "application may not be for you. Please take that into "
-				+ "consideration before voting it down!\n"
-				+ "--------------------------\n" + "INFO\n"
-				+ "--------------------------\n"
-				+ "This application creates a file called 'contacts.json'"
-				+ "on the external storage device (SDCard). You can start "
-				+ "this process by opening the menu and selecting 'Start "
-				+ "backup'.\n" + "Use it at your own risk!\n"
-				+ "--------------------------\n" + "Why?\n"
-				+ "--------------------------\n"
-				+ "I am having trouble syncing my contacts with google. As "
-				+ "it seems to be working for everyone else, I can only "
-				+ "assume that one or more contacts cause problems. That is "
-				+ "why I needed a tool to export my contacts. That way I "
-				+ "can manually edit them, re-import them onto the phone "
-				+ "and then retry syncing.");
-
+		
 		mBackupButton = (Button)findViewById(R.id.backup_button);
 		mBackupButton.setOnClickListener( new BackupListener() );
 		mRestoreButton = (Button)findViewById(R.id.restore_button);
@@ -141,7 +170,6 @@ public class ContactBackup extends Activity {
 					});
 		mErrorDialog = builder.create();
 
-		
 	}
 
 	@Override
@@ -249,6 +277,35 @@ public class ContactBackup extends Activity {
 			dialog = mErrorDialog;
 			break;
 
+		case DIALOG_EULA:
+			/*
+			 * Display the EULA on first start
+			 */
+			builder = new AlertDialog.Builder(ContactBackup.this);
+			builder.setMessage(getEula())
+					.setCancelable(false)
+					.setPositiveButton(getString(android.R.string.yes), 
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+								SharedPreferences.Editor editor = settings.edit();
+							    editor.putBoolean("eulaAccepted", true);
+							    editor.commit();
+							}
+						})
+					.setNegativeButton(getString(android.R.string.no),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+								SharedPreferences.Editor editor = settings.edit();
+							    editor.putBoolean("eulaAccepted", false);
+							    editor.commit();
+								dialog.cancel();
+							}
+						});
+			dialog = builder.create();
+			break;
+			
 		default:
 			/*
 			 * If an invalid dialog was specified, do nothing 
@@ -283,6 +340,27 @@ public class ContactBackup extends Activity {
 
 	}
 
+	
+	/**
+	 * @return The text contained in res/raw/eula.txt
+	 */
+	private String getEula(){
+		InputStream eula_stream = getResources().openRawResource(R.raw.eula);
+		StringBuffer content = new StringBuffer();
+		int result;
+		try {
+			result = eula_stream.read();
+			while ( result != -1 ){
+				content.append((char)result);
+				result = eula_stream.read();
+			}
+		} catch (IOException e) {
+			mErrorDialog.setMessage("Unable to open EULA!");
+			showDialog(DIALOG_ERROR);
+		}
+		return content.toString();
+	}
+	
 	/**
 	 * Listens to clicks on the "start backup" button
 	 * 
@@ -292,6 +370,14 @@ public class ContactBackup extends Activity {
 
 		@Override
 		public void onClick(View v) {
+			
+			if ( !getSharedPreferences(PREFS_NAME, 0).getBoolean("eulaAccepted", false) ){
+				/* EULA not accepted. Bail out! */
+				mErrorDialog.setMessage("You did not accept the EULA! You can access and accept it via the Menu button.");
+				showDialog(DIALOG_ERROR);
+				return;
+			}
+
 			File file1 = null;
 			file1 = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
 			if (file1.exists()) {
@@ -312,6 +398,14 @@ public class ContactBackup extends Activity {
 
 		@Override
 		public void onClick(View v) {
+			
+			if ( !getSharedPreferences(PREFS_NAME, 0).getBoolean("eulaAccepted", false) ){
+				/* EULA not accepted. Bail out! */
+				mErrorDialog.setMessage("You did not accept the EULA! You can access and accept it via the Menu button.");
+				showDialog(DIALOG_ERROR);
+				return;
+			}
+			
 			File file1 = null;
 			file1 = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
 			if (file1.exists()) {

@@ -1,0 +1,77 @@
+Disclaimer
+-----------------------------
+ When restoring, this
+ application replaces the
+ contacts currently stored on
+ your phone with those in the
+ loaded file. If the file
+ contains errors or is corrupt
+ in any way, then there is a
+ high risk of losing data!
+
+ By using this application you
+ accept this as your own risk.
+ The developer(s) will not
+ take any responsibility for
+ lost data.
+
+Target Audience
+-----------------------------
+ This application is primarily
+ meant for users who want to
+ retrieve a machine-readable
+ format of the contacts stored
+ on the device. The resulting
+ file can be used to read the
+ contacts into other
+ applications.
+
+ In addition to creating a
+ machine-readable file, the
+ application also provides the
+ option to read a file with an
+ identical format, thereby
+ replacing the contacts on the
+ device with those contained
+ in the file. This can
+ effectively be used as
+ backup/restore solution, but
+ this application is not meant
+ as a backup solution and as
+ such does not provide any
+ guarantee that there will be
+ no data loss.  Please read
+ the disclaimer above!
+
+ If the acronym JSON does not
+ mean anything to you or you
+ don't do software development
+ then this application may not
+ be for you. Please take that
+ into consideration before
+ voting it down!
+
+Usage
+-----------------------------
+ Please read the help as
+ offered by the application
+
+Rationale
+-----------------------------
+ I am having trouble syncing
+ my contacts with google. As
+ it seems to be working for
+ everyone else, I can only
+ assume that one or more
+ contacts cause problems.
+ That is why I needed a tool
+ to export my contacts. That
+ way I can manually edit them,
+ re-import them onto the phone
+ and then retry syncing.
+
+ On the other hand this gives
+ me a much friendlier format
+ to work with, so I can clean
+ up my contacts.
+

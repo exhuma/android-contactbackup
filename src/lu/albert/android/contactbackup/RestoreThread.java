@@ -61,7 +61,7 @@ public class RestoreThread extends Thread{
 	}
 	
 	public void run() {
-		
+
 		mParent.getContentResolver().delete(People.CONTENT_URI, null, null);
 		File file1 = null;
 		file1 = new File(Environment.getExternalStorageDirectory(),
@@ -171,13 +171,13 @@ public class RestoreThread extends Thread{
 			stream_buffer.close();
 			file_stream.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			showError(e.getMessage());
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			showError(e.getMessage());
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
+			showError(e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -195,7 +195,10 @@ public class RestoreThread extends Thread{
 		 */
 		ContentValues values = new ContentValues();
 		values.put( People._ID, contact.getString("id") );
-		values.put( People.NAME, contact.getString("name") );
+		values.put( People.NAME, contact.getString("id") );
+		values.put( People.TIMES_CONTACTED, contact.getString("times_contacted") );
+		//values.put( People.DISPLAY_NAME, contact.getString("display_name") );
+		values.put( People.STARRED, contact.getInt("starred") );
 		
 		Uri uri = Contacts.People
 		  .createPersonInMyContactsGroup(mParent.getContentResolver(), values);
@@ -217,10 +220,38 @@ public class RestoreThread extends Thread{
 			Uri phoneUri = null;
 			phoneUri = Uri.withAppendedPath(uri, People.Phones.CONTENT_DIRECTORY);
 			values.clear();
-			values.put(People.Phones.TYPE, People.Phones.TYPE_MOBILE);
+			values.put(People.Phones.TYPE, phone.getInt( "type" ));
 			values.put(People.Phones.NUMBER, phone.getString("number"));
+			values.put(People.Phones.ISPRIMARY, (phone.getBoolean("is_primary") ? 1 : 0));
 			mParent.getContentResolver().insert(phoneUri, values);
 		}
+		phones = null;
+		
+		/*
+		 * Store photo
+		 */
+		JSONArray photos = contact.getJSONArray("photos");
+		if ( photos.length() > 0 ) {
+			String photo = photos.getString(0);
+			if (photo != null ){
+				try {
+					Contacts.People.setPhotoData(mParent.getContentResolver(), uri, Base64.decode(photo));
+					System.out.println( "Added to " + uri );
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		photos = null;
+	}
+	
+	private void showError( String message ){
+		Message msg = mRestoreHandler.obtainMessage(ContactBackup.RESTORE_SHOW_ERROR);
+		Bundle b = new Bundle();
+		b.putString("message", message);
+		msg.setData(b);
+		mRestoreHandler.sendMessage(msg);
 	}
 }
 
