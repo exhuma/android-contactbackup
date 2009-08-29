@@ -19,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.TextView;
 
 /**
  * Activity to create a plain-text backup of you contact list. Only the most
@@ -146,11 +145,6 @@ public class ContactBackup extends Activity {
 		if ( !settings.getBoolean("eulaAccepted", false) ){
 			showDialog( DIALOG_EULA );
 		}
-		
-		SharedPreferences.Editor editor = settings.edit();
-	    editor.putBoolean("eulaAccepted", false);
-	    editor.commit();
-
 		
 		mBackupButton = (Button)findViewById(R.id.backup_button);
 		mBackupButton.setOnClickListener( new BackupListener() );
