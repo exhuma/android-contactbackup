@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="unspecified_error">Unspecified error</string>
+    <string name="error">Error</string>
+    <string name="restoring">Restoring...</string>
+    <string name="serializing">Serializing...</string>
+    <string name="operation_finished">Operation finished.</string>
+    <string name="cancelled_by_user_request">Cancelled by user request.</string>
     <string name="disclaimer">Hello World, ContactBackup</string>
     <string name="app_name">Contact Backup</string>
 <string name="menu_start">Start backup</string>
 <string name="menu_delete_json">Delete JSON file</string>
 <string name="restore_button">Restore from file</string>
 <string name="backup_button">Save to file</string>
+<string name="file_exists">"File %s exists. Do you want to overwrite it?"</string>
 </resources>
