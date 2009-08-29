@@ -14,4 +14,6 @@
     </application>
 <uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
 <uses-sdk android:minSdkVersion="3"></uses-sdk>
+<uses-permission android:name="android.permission.WRITE_CONTACTS"></uses-permission>
+
 </manifest> 

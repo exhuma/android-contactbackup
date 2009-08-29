@@ -1,11 +1,19 @@
 package lu.albert.android.contactbackup;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+
+import lu.albert.android.contactbackup.R;
+import lu.albert.android.contactbackup.R.id;
+import lu.albert.android.contactbackup.R.layout;
+import lu.albert.android.contactbackup.R.string;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,12 +23,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Contacts;
 import android.provider.Contacts.People;
 import android.provider.Contacts.Phones;
 import android.provider.Contacts.Photos;
@@ -47,10 +58,14 @@ public class ContactBackup extends Activity {
 	private static final int DIALOG_CANCELLED = 1;
 	private static final int DIALOG_PROGRESS = 2;
 	protected static final int DIALOG_FINISHED = 3;
+	private static final int DIALOG_RESTORE_PROGRESS = 4;
+	protected static final int RESTORE_MSG_PROGRESS = 0;
+	protected static final int RESTORE_MSG_INFO = 1;
 	private TextView mLogText;
 	private Button mBackupButton;
 
-	ProgressThread progressThread;
+	BackupThread progressThread;
+	RestoreThread restoreThread;
 	ProgressDialog progressDialog;
 
 	/**
@@ -65,11 +80,43 @@ public class ContactBackup extends Activity {
 			progressDialog.setMax(total);
 			if (position >= total) {
 				dismissDialog(DIALOG_PROGRESS);
-				progressThread.setState(ProgressThread.STATE_DONE);
+				progressThread.setState(BackupThread.STATE_DONE);
 				showDialog(DIALOG_FINISHED);
 			}
 		}
 	};
+	
+	/**
+	 * A handler which deals with updating the progress bar
+	 */
+	final Handler restore_handler = new Handler() {
+		public void handleMessage(Message msg) {
+			
+			switch ( msg.what ){
+			case RESTORE_MSG_PROGRESS:
+				long position = msg.getData().getLong("position");
+				long total = msg.getData().getLong("total");
+				progressDialog.setProgress((int)position);
+				progressDialog.setIndeterminate(false);
+				progressDialog.setMax((int)total);
+				if (position >= total) {
+					dismissDialog(DIALOG_RESTORE_PROGRESS);
+					restoreThread.setState(BackupThread.STATE_DONE);
+					showDialog(DIALOG_FINISHED);
+				}
+				break;
+			case RESTORE_MSG_INFO:
+				String name = msg.getData().getString("name");
+				progressDialog.setMessage( "Restored " + name );
+				break;
+			default:
+				// do nothing
+				break;
+			}
+		}
+	};
+	private View mRestoreButton;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -100,6 +147,13 @@ public class ContactBackup extends Activity {
 
 		mBackupButton = (Button)findViewById(R.id.backup_button);
 		mBackupButton.setOnClickListener( new BackupListener() );
+		mRestoreButton = (Button)findViewById(R.id.restore_button);
+		mRestoreButton.setOnClickListener( new RestoreListener() );
+		
+		ContentValues values = new ContentValues();
+		values.put( People.NAME, "myname" );
+		Uri uri = getContentResolver().insert(People.CONTENT_URI, values);
+
 	}
 
 	@Override
@@ -163,9 +217,19 @@ public class ContactBackup extends Activity {
 			progressDialog = new ProgressDialog(ContactBackup.this);
 			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			progressDialog.setMessage("Serializing...");
-			progressThread = new ProgressThread(handler);
+			progressThread = new BackupThread(handler);
 			progressDialog.setIndeterminate(true);
 			progressThread.start();
+			dialog = progressDialog;
+			break;
+
+		case DIALOG_RESTORE_PROGRESS:
+			progressDialog = new ProgressDialog(ContactBackup.this);
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			progressDialog.setMessage("Restoring...");
+			restoreThread = new RestoreThread(restore_handler);
+			progressDialog.setIndeterminate(true);
+			restoreThread.start();
 			dialog = progressDialog;
 			break;
 
@@ -219,14 +283,153 @@ public class ContactBackup extends Activity {
 
 	}
 
-	private class ProgressThread extends Thread {
+	private class RestoreThread extends Thread{
+		Handler mRestoreHandler;
+		final static int STATE_DONE = 0;
+		final static int STATE_RUNNING = 1;
+		int mState;
+		int total;
+
+		RestoreThread(Handler h) {
+			mRestoreHandler = h;
+		}
+		
+		/*
+		 * sets the current state for the thread, used to stop the thread
+		 */
+		public void setState(int state) {
+			mState = state;
+		}
+		
+		public void run() {
+			
+			getContentResolver().delete(People.CONTENT_URI, null, null);
+			File file1 = null;
+			file1 = new File(Environment.getExternalStorageDirectory(),
+					FILE_NAME);
+			
+			this.readStream(file1);
+			
+			mState = STATE_DONE;
+		}
+
+		/**
+		 * Read the on-disk data by streaming it without creating a complete JSONArray in memory
+		 * @param in_file The input file
+		 */
+		private void readStream(File in_file) {
+			StringBuffer data = new StringBuffer();
+			FileInputStream file_in = null;
+			JSONObject contact = null;
+			try {
+				file_in = new FileInputStream(in_file);
+				BufferedInputStream buf = new BufferedInputStream(file_in);
+				InputStreamReader in_stream = new InputStreamReader(buf);
+				int data_available = in_stream.read();
+				int braceDepth = 0;
+				boolean contactOpen = false;
+				long count = 0;
+				while( data_available != -1 ) {
+					char theChar = (char) data_available;
+					if (theChar == '{') {
+						if (braceDepth == 0) {
+							contactOpen = true;
+							data = new StringBuffer();
+						}
+						braceDepth += 1;
+					} else if (theChar == '}') {
+						braceDepth -= 1;
+					}
+					data.append(theChar);
+					
+					if (braceDepth == 0 && contactOpen) {
+						contact = new JSONObject( data.toString() );
+						store_contact( contact );
+						contactOpen = false;
+						
+						Message msg = mRestoreHandler.obtainMessage(ContactBackup.RESTORE_MSG_INFO);
+						Bundle b = new Bundle();
+						b.putString("name", contact.getString("name"));
+						msg.setData(b);
+						mRestoreHandler.sendMessage(msg);
+					}
+					
+					data_available = in_stream.read();
+					count += 1;
+					
+					if ( count % 100 == 0) {
+						Message msg = mRestoreHandler.obtainMessage(ContactBackup.RESTORE_MSG_PROGRESS);
+						Bundle b = new Bundle();
+						b.putLong("position", count);
+						b.putLong("total", in_file.length());
+						msg.setData(b);
+						mRestoreHandler.sendMessage(msg);
+					}
+
+				}
+				Message msg = mRestoreHandler.obtainMessage(ContactBackup.RESTORE_MSG_PROGRESS);
+				Bundle b = new Bundle();
+				b.putLong("position", in_file.length());
+				b.putLong("total", in_file.length());
+				msg.setData(b);
+				
+				mRestoreHandler.sendMessage(msg);
+				in_stream.close();
+				buf.close();
+				file_in.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		private void store_contact(JSONObject contact) throws JSONException {
+			
+			ContentValues values = new ContentValues();
+			values.put( People._ID, contact.getString("id") );
+			values.put( People.NAME, contact.getString("name") );
+			
+			Uri uri = Contacts.People
+			  .createPersonInMyContactsGroup(getContentResolver(), values);
+			
+			System.out.println( "Created contact " + uri); // TODO remove
+			
+			if ( uri == null) {
+				return;
+			}
+			
+			JSONArray phones = contact.getJSONArray("phonenumbers");
+			for( int i = 0; i < phones.length(); ++i ){
+				JSONObject phone = phones.getJSONObject(i);
+				if (phone == null ){
+					continue;
+				}
+				
+				System.out.println( "Adding phone " + phone.getString("number") + " to " + uri + " (" + contact.getString("name") + ")" ); //TODO remove
+				Uri phoneUri = null;
+				phoneUri = Uri.withAppendedPath(uri, People.Phones.CONTENT_DIRECTORY);
+				values.clear();
+				values.put(People.Phones.TYPE, People.Phones.TYPE_MOBILE);
+				values.put(People.Phones.NUMBER, phone.getString("number"));
+				getContentResolver().insert(phoneUri, values);
+			}
+		}
+	}
+	
+	private class BackupThread extends Thread {
 		Handler mHandler;
 		final static int STATE_DONE = 0;
 		final static int STATE_RUNNING = 1;
 		int mState;
 		int total;
 
-		ProgressThread(Handler h) {
+		BackupThread(Handler h) {
 			mHandler = h;
 		}
 
@@ -494,5 +697,16 @@ public class ContactBackup extends Activity {
 		}
 		
 	}
+	private class RestoreListener implements OnClickListener{
 
+		@Override
+		public void onClick(View v) {
+			File file1 = null;
+			file1 = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
+			if (file1.exists()) {
+				showDialog(DIALOG_RESTORE_PROGRESS);
+			}
+		}
+		
+	}
 }
