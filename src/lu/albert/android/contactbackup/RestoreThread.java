@@ -1,6 +1,7 @@
 package lu.albert.android.contactbackup;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,7 +12,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,6 +23,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Contacts;
 import android.provider.Contacts.People;
+import android.provider.Contacts.Photos;
 
 /**
  * The thread which reads the input file and restores the contacts.
@@ -190,18 +195,20 @@ public class RestoreThread extends Thread{
 	 */
 	private void store_contact(JSONObject contact) throws JSONException {
 		
+		ContentResolver cr = mParent.getContentResolver();
+		
 		/*
 		 * Store base values
 		 */
 		ContentValues values = new ContentValues();
 		values.put( People._ID, contact.getString("id") );
-		values.put( People.NAME, contact.getString("id") );
+		values.put( People.NAME, contact.getString("name") );
 		values.put( People.TIMES_CONTACTED, contact.getString("times_contacted") );
-		//values.put( People.DISPLAY_NAME, contact.getString("display_name") );
+		// TODO: values.put( People.DISPLAY_NAME, contact.getString("display_name") );
 		values.put( People.STARRED, contact.getInt("starred") );
 		
 		Uri uri = Contacts.People
-		  .createPersonInMyContactsGroup(mParent.getContentResolver(), values);
+		  .createPersonInMyContactsGroup(cr, values);
 		
 		if ( uri == null) {
 			return;
@@ -223,7 +230,7 @@ public class RestoreThread extends Thread{
 			values.put(People.Phones.TYPE, phone.getInt( "type" ));
 			values.put(People.Phones.NUMBER, phone.getString("number"));
 			values.put(People.Phones.ISPRIMARY, (phone.getBoolean("is_primary") ? 1 : 0));
-			mParent.getContentResolver().insert(phoneUri, values);
+			cr.insert(phoneUri, values);
 		}
 		phones = null;
 		
@@ -233,10 +240,10 @@ public class RestoreThread extends Thread{
 		JSONArray photos = contact.getJSONArray("photos");
 		if ( photos.length() > 0 ) {
 			String photo = photos.getString(0);
-			if (photo != null ){
+			if (photo != null && !photo.equals("") ){
 				try {
-					Contacts.People.setPhotoData(mParent.getContentResolver(), uri, Base64.decode(photo));
-					System.out.println( "Added to " + uri );
+					Contacts.People.setPhotoData(cr, uri, Base64.decode(photo));
+					System.out.println( "Added photo to " + uri );
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
