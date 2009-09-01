@@ -1,77 +1,38 @@
-Disclaimer
+Do you accept the following
+terms?
 -----------------------------
- When restoring, this
- application replaces the
- contacts currently stored on
- your phone with those in the
- loaded file. If the file
- contains errors or is corrupt
- in any way, then there is a
- high risk of losing data!
 
- By using this application you
- accept this as your own risk.
- The developer(s) will not
- take any responsibility for
- lost data.
+ContactBackup is used to
+create/load a JSON dump of the
+contacts stored on an Android
+OS. Copyright (C) 2009 Michel
+Albert
 
-Target Audience
------------------------------
- This application is primarily
- meant for users who want to
- retrieve a machine-readable
- format of the contacts stored
- on the device. The resulting
- file can be used to read the
- contacts into other
- applications.
+This library is free software;
+you can redistribute it and/or
+modify it under the terms of
+the GNU Lesser General Public
+License as published by the
+Free Software Foundation;
+either version 2.1 of the
+License, or (at your option)
+any later version.
 
- In addition to creating a
- machine-readable file, the
- application also provides the
- option to read a file with an
- identical format, thereby
- replacing the contacts on the
- device with those contained
- in the file. This can
- effectively be used as
- backup/restore solution, but
- this application is not meant
- as a backup solution and as
- such does not provide any
- guarantee that there will be
- no data loss.  Please read
- the disclaimer above!
+This library is distributed in
+the hope that it will be
+useful, but WITHOUT ANY
+WARRANTY; without even the
+implied warranty of
+MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE. See the
+GNU Lesser General Public
+License for more details.
 
- If the acronym JSON does not
- mean anything to you or you
- don't do software development
- then this application may not
- be for you. Please take that
- into consideration before
- voting it down!
-
-Usage
------------------------------
- Please read the help as
- offered by the application
-
-Rationale
------------------------------
- I am having trouble syncing
- my contacts with google. As
- it seems to be working for
- everyone else, I can only
- assume that one or more
- contacts cause problems.
- That is why I needed a tool
- to export my contacts. That
- way I can manually edit them,
- re-import them onto the phone
- and then retry syncing.
-
- On the other hand this gives
- me a much friendlier format
- to work with, so I can clean
- up my contacts.
+You should have received a
+copy of the GNU Lesser General
+Public License along with this
+library; if not, write to the
+Free Software Foundation,
+Inc., 59 Temple Place, Suite
+330, Boston, MA 02111-1307 USA 
 

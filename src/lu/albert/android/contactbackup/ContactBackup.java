@@ -34,6 +34,8 @@ public class ContactBackup extends Activity {
 	public static final String FILE_NAME = "contacts.json";
 	
 	private static final int MENU_EULA = Menu.FIRST;
+	private static final int MENU_LICENSE = Menu.FIRST + 1;
+	private static final int MENU_USAGE = Menu.FIRST + 2;
 	
 	private static final int DIALOG_CONFIRM_OVERWRITE = 0;
 	private static final int DIALOG_CANCELLED = 1;
@@ -42,6 +44,8 @@ public class ContactBackup extends Activity {
 	private static final int DIALOG_RESTORE_PROGRESS = 4;
 	private static final int DIALOG_ERROR = 5;
 	private static final int DIALOG_EULA = 6;
+	private static final int DIALOG_LICENSE = 7;
+	private static final int DIALOG_USAGE = 8;
 	
 	protected static final int RESTORE_MSG_PROGRESS = 0;
 	protected static final int RESTORE_MSG_INFO = 1;
@@ -123,6 +127,10 @@ public class ContactBackup extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    menu.add(0, MENU_EULA, 0, "EULA")
 	    	.setIcon(android.R.drawable.ic_dialog_info);
+	    menu.add(0, MENU_USAGE, 0, "Help")
+		.setIcon(android.R.drawable.ic_menu_help);
+	    menu.add(0, MENU_LICENSE, 0, "License")
+	    	.setIcon(android.R.drawable.ic_menu_agenda);
 	    return true;
 	}
 
@@ -131,6 +139,12 @@ public class ContactBackup extends Activity {
 	    switch (item.getItemId()) {
 	    case MENU_EULA:
 	    	showDialog( DIALOG_EULA );
+	        return true;
+	    case MENU_LICENSE:
+	    	showDialog( DIALOG_LICENSE );
+	        return true;
+	    case MENU_USAGE:
+	    	showDialog( DIALOG_USAGE );
 	        return true;
 	    }
 	    return false;
@@ -300,6 +314,38 @@ public class ContactBackup extends Activity {
 			dialog = builder.create();
 			break;
 			
+		case DIALOG_LICENSE:
+			/*
+			 * Display the License
+			 */
+			builder = new AlertDialog.Builder(ContactBackup.this);
+			builder.setMessage(getLicense())
+					.setCancelable(false)
+					.setNegativeButton(getString(android.R.string.ok),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
+			dialog = builder.create();
+			break;
+			
+		case DIALOG_USAGE:
+			/*
+			 * Display the Usage
+			 */
+			builder = new AlertDialog.Builder(ContactBackup.this);
+			builder.setMessage(getUsage())
+					.setCancelable(false)
+					.setNegativeButton(getString(android.R.string.ok),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
+			dialog = builder.create();
+			break;
+			
 		default:
 			/*
 			 * If an invalid dialog was specified, do nothing 
@@ -334,7 +380,6 @@ public class ContactBackup extends Activity {
 
 	}
 
-	
 	/**
 	 * @return The text contained in res/raw/eula.txt
 	 */
@@ -355,6 +400,46 @@ public class ContactBackup extends Activity {
 		return content.toString();
 	}
 	
+	/**
+	 * @return The text contained in res/raw/license.txt
+	 */
+	private String getLicense(){
+		InputStream license_stream = getResources().openRawResource(R.raw.license);
+		StringBuffer content = new StringBuffer();
+		int result;
+		try {
+			result = license_stream.read();
+			while ( result != -1 ){
+				content.append((char)result);
+				result = license_stream.read();
+			}
+		} catch (IOException e) {
+			mErrorDialog.setMessage("Unable to open the license file!");
+			showDialog(DIALOG_ERROR);
+		}
+		return content.toString();
+	}
+
+	/**
+	 * @return The text contained in res/raw/license.txt
+	 */
+	private String getUsage(){
+		InputStream file_stream = getResources().openRawResource(R.raw.usage);
+		StringBuffer content = new StringBuffer();
+		int result;
+		try {
+			result = file_stream.read();
+			while ( result != -1 ){
+				content.append((char)result);
+				result = file_stream.read();
+			}
+		} catch (IOException e) {
+			mErrorDialog.setMessage("Unable to open the usage file!");
+			showDialog(DIALOG_ERROR);
+		}
+		return content.toString();
+	}
+
 	/**
 	 * Listens to clicks on the "start backup" button
 	 * 

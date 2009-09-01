@@ -1,18 +1,49 @@
 Usage
 ==================================================
 
-   Remember that you accepted
-   the risks that come with
-   using this application!
+Target Audience
+-----------------------------
+ This application is primarily
+ meant for users who want to
+ retrieve a machine-readable
+ format of the contacts stored
+ on the device. The resulting
+ file can be used to read the
+ contacts into other
+ applications.
+
+ In addition to creating a
+ machine-readable file, the
+ application also provides the
+ option to read a file with an
+ identical format, thereby
+ replacing the contacts on the
+ device with those contained
+ in the file. This can
+ effectively be used as
+ backup/restore solution, but
+ this application is not meant
+ as a backup solution and as
+ such does not provide any
+ guarantee that it will be fit
+for that purpose
+
+ If the acronym JSON does not
+ mean anything to you or you
+ don't do software development
+ then this application may not
+ be for you. Please take that
+ into consideration before
+ voting it down!
 
 Creating a dump file
 -----------------------------
-   Click on the button
-   labelled "Save to file".
-   This will create a file
-   called 'contacts.json' on
-   the external storage device
-   (SDCard).
+ Click on the button labelled
+"Save to file".  This will
+create a file called
+'contacts.json' on the
+external storage device
+(SDCard).
 
 Loading a dump file
 -----------------------------
@@ -33,4 +64,23 @@ Loading a dump file
  characters read from the file
  instead of the number of
  contacts.
+
+Rationale
+-----------------------------
+ I am having trouble syncing
+ my contacts with google. As
+ it seems to be working for
+ everyone else, I can only
+ assume that one or more
+ contacts cause problems.
+ That is why I needed a tool
+ to export my contacts. That
+ way I can manually edit them,
+ re-import them onto the phone
+ and then retry syncing.
+
+ On the other hand this gives
+ me a much friendlier format
+ to work with, so I can clean
+ up my contacts.
 
