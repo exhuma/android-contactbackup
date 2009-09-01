@@ -7,6 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import lu.albert.android.contactbackup.schema.ContactColumns;
+import lu.albert.android.contactbackup.schema.ContactColumns.OrganizationColumns;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -119,32 +122,30 @@ public class BackupThread extends Thread {
 
 				JSONObject contact = new JSONObject();
 				try {
-					contact.put("id", id);
-					contact
-							.put("name", managedCursor
-									.getString(nameColumn));
-
-					contact.put("custom_ring_tone", managedCursor
+					contact.put(ContactColumns.ID, id);
+					contact.put(ContactColumns.NAME,
+							managedCursor.getString(nameColumn));
+					contact.put(ContactColumns.CUSTOM_RING_TONE, managedCursor
 							.getString(ringToneColumn));
-					contact.put("display_name", managedCursor
+					contact.put(ContactColumns.DISPLAY_NAME, managedCursor
 							.getString(displayNameColumn));
-					contact.put("last_time_contacted", managedCursor
+					contact.put(ContactColumns.LAST_TIME_CONTACTED, managedCursor
 							.getString(lastTimeContactedColumn));
-					contact.put("notes", managedCursor
+					contact.put(ContactColumns.NOTES, managedCursor
 							.getString(notesColumn));
-					contact.put("phonetic_name", managedCursor
+					contact.put(ContactColumns.PHONETIC_NAME, managedCursor
 							.getString(phoneticNameColumn));
-					contact.put("send_to_voicemail", managedCursor
+					contact.put(ContactColumns.SEND_TO_VOICEMAIL, managedCursor
 							.getString(sendToVoiceMailColumn));
-					contact.put("starred", managedCursor
+					contact.put(ContactColumns.STARRED, managedCursor
 							.getString(starredColumn));
-					contact.put("times_contacted", managedCursor
+					contact.put(ContactColumns.TIMES_CONTACTED, managedCursor
 							.getString(timesContactedColumn));
 					try {
-						contact.put("photo_version", managedCursor
+						contact.put(ContactColumns.PHOTO_VERSION, managedCursor
 								.getString(photoVersionColumn));
 					} catch (IllegalStateException e) {
-						contact.put("photo_version", null);
+						contact.put(ContactColumns.PHOTO_VERSION, null);
 						System.err
 								.println("Unable to retrieve photo_version for contact #"
 										+ id);
@@ -222,7 +223,7 @@ public class BackupThread extends Thread {
 	 *             JSON
 	 */
 	private void appendPhotos(JSONObject contact) throws JSONException {
-		String where = Photos.PERSON_ID + "=" + contact.getInt("id");
+		String where = Photos.PERSON_ID + "=" + contact.getInt( ContactColumns.ID );
 		Cursor cursor = mParent.managedQuery(Photos.CONTENT_URI, null, where, null,
 				null);
 
@@ -238,7 +239,7 @@ public class BackupThread extends Thread {
 				}
 			} while (cursor.moveToNext());
 		}
-		contact.put("photos", photos);
+		contact.put( ContactColumns.PHOTOS, photos);
 	}
 	
 	/**
@@ -254,7 +255,7 @@ public class BackupThread extends Thread {
 	 */
 	private void appendContactMethods( JSONObject contact ) throws JSONException{
 		
-		String where = ContactMethods.PERSON_ID + "=" + contact.getInt("id");
+		String where = ContactMethods.PERSON_ID + "=" + contact.getInt( ContactColumns.ID );
 		Cursor cursor = mParent.managedQuery(ContactMethods.CONTENT_URI, null, where, null,
 				null);
 		
@@ -270,17 +271,22 @@ public class BackupThread extends Thread {
 		if (cursor.moveToFirst()) {
 			do {
 				JSONObject method = new JSONObject();
-				method.put("is_primary",
+				method.put(ContactColumns.ContactMethodColumns.IS_PRIMARY,
 						(cursor.getInt(isPrimaryColumn) != 0));
-				method.put("label", cursor.getString(labelColumn));
-				method.put("type", cursor.getString(typeColumn));
-				method.put("aux_data", cursor.getString(auxDataColumn));
-				method.put("data", cursor.getString(dataColumn));
-				method.put("kind", cursor.getString(kindColumn));
+				method.put(ContactColumns.ContactMethodColumns.LABEL,
+						cursor.getString(labelColumn));
+				method.put(ContactColumns.ContactMethodColumns.TYPE,
+						cursor.getString(typeColumn));
+				method.put(ContactColumns.ContactMethodColumns.AUX_DATA,
+						cursor.getString(auxDataColumn));
+				method.put(ContactColumns.ContactMethodColumns.DATA,
+						cursor.getString(dataColumn));
+				method.put(ContactColumns.ContactMethodColumns.KIND,
+						cursor.getString(kindColumn));
 				contactMethods.put(method);
 			} while (cursor.moveToNext());
 		}
-		contact.put("contact_methods", contactMethods);
+		contact.put(ContactColumns.CONTACT_METHODS, contactMethods);
 		
 	}
 
@@ -301,7 +307,7 @@ public class BackupThread extends Thread {
 
 		String where;
 		try{
-			where = Phones.PERSON_ID + "=" + contact.getInt("id");
+			where = Phones.PERSON_ID + "=" + contact.getInt( ContactColumns.ID );
 		} catch (JSONException e) {
 			System.err.println("unable to get contact: " + e.getMessage()); // TODO logging
 			return;
@@ -320,16 +326,20 @@ public class BackupThread extends Thread {
 		if (cursor.moveToFirst()) {
 			do {
 				JSONObject number = new JSONObject();
-				number.put("is_primary",
+				number.put(ContactColumns.PhoneColumns.IS_PRIMARY,
 						(cursor.getInt(isPrimaryColumn) != 0));
-				number.put("label", cursor.getString(labelColumn));
-				number.put("number", cursor.getString(numberColumn));
-				number.put("number_key", cursor.getString(numberKeyColumn));
-				number.put("type", cursor.getString(typeColumn));
+				number.put(ContactColumns.PhoneColumns.LABEL,
+						cursor.getString(labelColumn));
+				number.put(ContactColumns.PhoneColumns.NUMBER,
+						cursor.getString(numberColumn));
+				number.put(ContactColumns.PhoneColumns.NUMBER_KEY,
+						cursor.getString(numberKeyColumn));
+				number.put(ContactColumns.PhoneColumns.TYPE,
+						cursor.getString(typeColumn));
 				phonenumbers.put(number);
 			} while (cursor.moveToNext());
 		}
-		contact.put("phonenumbers", phonenumbers);
+		contact.put(ContactColumns.PHONE_NUMBERS, phonenumbers);
 
 	}
 
@@ -348,7 +358,7 @@ public class BackupThread extends Thread {
 	private void appendOrganizations(JSONObject contact) throws JSONException
 			{
 
-		String where = Organizations.PERSON_ID + "=" + contact.getInt("id");
+		String where = Organizations.PERSON_ID + "=" + contact.getInt( ContactColumns.ID );
 		Cursor cursor = mParent.managedQuery(Organizations.CONTENT_URI, null, where, null,
 				null);
 
@@ -362,16 +372,20 @@ public class BackupThread extends Thread {
 		if (cursor.moveToFirst()) {
 			do {
 				JSONObject org = new JSONObject();
-				org.put("is_primary",
+				org.put(OrganizationColumns.IS_PRIMARY,
 						(cursor.getInt(isPrimaryColumn) != 0));
-				org.put("label", cursor.getString(labelColumn));
-				org.put("title", cursor.getString(titleColumn));
-				org.put("company", cursor.getString(companyColumn));
-				org.put("type", cursor.getString(typeColumn));
+				org.put(OrganizationColumns.LABEL,
+						cursor.getString(labelColumn));
+				org.put(OrganizationColumns.TITLE,
+						cursor.getString(titleColumn));
+				org.put(OrganizationColumns.COMPANY,
+						cursor.getString(companyColumn));
+				org.put(OrganizationColumns.TYPE,
+						cursor.getString(typeColumn));
 				organizations.put(org);
 			} while (cursor.moveToNext());
 		}
-		contact.put("organizations", organizations);
+		contact.put(ContactColumns.ORGANIZATIONS, organizations);
 
 	}
 	

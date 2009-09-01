@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import lu.albert.android.contactbackup.schema.ContactColumns;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -130,7 +132,7 @@ public class RestoreThread extends Thread{
 					
 					Message msg = mRestoreHandler.obtainMessage(ContactBackup.RESTORE_MSG_INFO);
 					Bundle b = new Bundle();
-					b.putString("name", contact.getString("name"));
+					b.putString("name", contact.getString( ContactColumns.NAME ));
 					msg.setData(b);
 					mRestoreHandler.sendMessage(msg);
 				}
@@ -197,11 +199,11 @@ public class RestoreThread extends Thread{
 		 * Store base values
 		 */
 		ContentValues values = new ContentValues();
-		values.put( People._ID, contact.getString("id") );
-		values.put( People.NAME, contact.getString("name") );
-		values.put( People.TIMES_CONTACTED, contact.getString("times_contacted") );
-		// TODO: values.put( People.DISPLAY_NAME, contact.getString("display_name") );
-		values.put( People.STARRED, contact.getInt("starred") );
+		values.put( People._ID, contact.getString( ContactColumns.ID ) );
+		values.put( People.NAME, contact.getString( ContactColumns.NAME ) );
+		values.put( People.TIMES_CONTACTED, contact.getString( ContactColumns.TIMES_CONTACTED ) );
+		// TODO: values.put( People.DISPLAY_NAME, contact.getString(ContactColumns.DISPLAY_NAME) );
+		values.put( People.STARRED, contact.getInt( ContactColumns.STARRED ) );
 		
 		Uri uri = Contacts.People
 		  .createPersonInMyContactsGroup(cr, values);
@@ -213,7 +215,7 @@ public class RestoreThread extends Thread{
 		/*
 		 * Store phone numbers
 		 */
-		JSONArray phones = contact.getJSONArray("phonenumbers");
+		JSONArray phones = contact.getJSONArray( ContactColumns.PHONE_NUMBERS );
 		for( int i = 0; i < phones.length(); ++i ){
 			JSONObject phone = phones.getJSONObject(i);
 			if (phone == null ){
@@ -223,9 +225,9 @@ public class RestoreThread extends Thread{
 			Uri phoneUri = null;
 			phoneUri = Uri.withAppendedPath(uri, People.Phones.CONTENT_DIRECTORY);
 			values.clear();
-			values.put(People.Phones.TYPE, phone.getInt( "type" ));
-			values.put(People.Phones.NUMBER, phone.getString("number"));
-			values.put(People.Phones.ISPRIMARY, (phone.getBoolean("is_primary") ? 1 : 0));
+			values.put(People.Phones.TYPE, phone.getInt( ContactColumns.PhoneColumns.TYPE ));
+			values.put(People.Phones.NUMBER, phone.getString( ContactColumns.PhoneColumns.NUMBER ));
+			values.put(People.Phones.ISPRIMARY, (phone.getBoolean(ContactColumns.PhoneColumns.IS_PRIMARY ) ? 1 : 0));
 			cr.insert(phoneUri, values);
 		}
 		phones = null;
@@ -233,7 +235,7 @@ public class RestoreThread extends Thread{
 		/*
 		 * Store photo
 		 */
-		JSONArray photos = contact.getJSONArray("photos");
+		JSONArray photos = contact.getJSONArray( ContactColumns.PHOTOS );
 		if ( photos.length() > 0 ) {
 			String photo = photos.getString(0);
 			if (photo != null && !photo.equals("") ){
