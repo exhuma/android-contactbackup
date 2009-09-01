@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Contacts.ContactMethods;
+import android.provider.Contacts.Organizations;
 import android.provider.Contacts.People;
 import android.provider.Contacts.Phones;
 import android.provider.Contacts.Photos;
@@ -144,12 +146,15 @@ public class BackupThread extends Thread {
 					} catch (IllegalStateException e) {
 						contact.put("photo_version", null);
 						System.err
-								.println("Unable to retrieve photo ID for contact #"
+								.println("Unable to retrieve photo_version for contact #"
 										+ id);
 					}
 
-					this.appendPhoneNumbers(contact);
+					this.appendContactMethods(contact);
 					this.appendPhotos(contact);
+					this.appendPhoneNumbers(contact);
+					this.appendOrganizations(contact);
+					
 					writer.write(contact.toString(3));
 					
 					/* Add commas (JSON array grammar) */
@@ -196,6 +201,15 @@ public class BackupThread extends Thread {
 	}
 
 	/**
+	 * sets the current state for the thread, used to stop the thread
+	 * 
+	 * @param state The new state
+	 */
+	public void setState(int state) {
+		mState = state;
+	}
+
+	/**
 	 * Append photos as Base64 encoded strings to the given contact. This is
 	 * an in-place modification of the "contact" object
 	 * 
@@ -226,6 +240,49 @@ public class BackupThread extends Thread {
 		}
 		contact.put("photos", photos);
 	}
+	
+	/**
+	 * Append all non-phone contact methods to the contact
+	 * 
+	 * @param contact
+	 *            A JSON object representing a contact. It must have at
+	 *            least a key named "id" representing the internal
+	 *            contact-ID
+	 * @throws JSONException
+	 *             Thrown when data could not be successfully encoded to
+	 *             JSON
+	 */
+	private void appendContactMethods( JSONObject contact ) throws JSONException{
+		
+		String where = ContactMethods.PERSON_ID + "=" + contact.getInt("id");
+		Cursor cursor = mParent.managedQuery(ContactMethods.CONTENT_URI, null, where, null,
+				null);
+		
+		int auxDataColumn = cursor.getColumnIndex(ContactMethods.AUX_DATA);
+		int dataColumn = cursor.getColumnIndex(ContactMethods.DATA);
+		int isPrimaryColumn = cursor.getColumnIndex(ContactMethods.ISPRIMARY);
+		int kindColumn = cursor.getColumnIndex(ContactMethods.KIND);
+		int labelColumn = cursor.getColumnIndex(ContactMethods.LABEL);
+		int typeColumn = cursor.getColumnIndex(ContactMethods.TYPE);
+		
+		JSONArray contactMethods = new JSONArray();
+
+		if (cursor.moveToFirst()) {
+			do {
+				JSONObject method = new JSONObject();
+				method.put("is_primary",
+						(cursor.getInt(isPrimaryColumn) != 0));
+				method.put("label", cursor.getString(labelColumn));
+				method.put("type", cursor.getString(typeColumn));
+				method.put("aux_data", cursor.getString(auxDataColumn));
+				method.put("data", cursor.getString(dataColumn));
+				method.put("kind", cursor.getString(kindColumn));
+				contactMethods.put(method);
+			} while (cursor.moveToNext());
+		}
+		contact.put("contact_methods", contactMethods);
+		
+	}
 
 	/**
 	 * Append a list of phone numbers to the given contact This is an
@@ -239,10 +296,16 @@ public class BackupThread extends Thread {
 	 *             Thrown when data could not be successfully encoded to
 	 *             JSON
 	 */
-	private void appendPhoneNumbers(JSONObject contact)
-			throws JSONException {
+	private void appendPhoneNumbers(JSONObject contact) throws JSONException
+			{
 
-		String where = Phones.PERSON_ID + "=" + contact.getInt("id");
+		String where;
+		try{
+			where = Phones.PERSON_ID + "=" + contact.getInt("id");
+		} catch (JSONException e) {
+			System.err.println("unable to get contact: " + e.getMessage()); // TODO logging
+			return;
+		}
 		Cursor cursor = mParent.managedQuery(Phones.CONTENT_URI, null, where, null,
 				null);
 
@@ -253,10 +316,10 @@ public class BackupThread extends Thread {
 		int typeColumn = cursor.getColumnIndex(Phones.TYPE);
 
 		JSONArray phonenumbers = new JSONArray();
-		JSONObject number = new JSONObject();
 
 		if (cursor.moveToFirst()) {
 			do {
+				JSONObject number = new JSONObject();
 				number.put("is_primary",
 						(cursor.getInt(isPrimaryColumn) != 0));
 				number.put("label", cursor.getString(labelColumn));
@@ -271,12 +334,46 @@ public class BackupThread extends Thread {
 	}
 
 	/**
-	 * sets the current state for the thread, used to stop the thread
+	 * Append a list of organizations to the given contact This is an
+	 * in-place modification of the "contact" object
 	 * 
-	 * @param state The new state
+	 * @param contact
+	 *            A JSON object representing a contact. It must have at
+	 *            least a key named "id" representing the internal
+	 *            contact-ID
+	 * @throws JSONException
+	 *             Thrown when data could not be successfully encoded to
+	 *             JSON
 	 */
-	public void setState(int state) {
-		mState = state;
+	private void appendOrganizations(JSONObject contact) throws JSONException
+			{
+
+		String where = Organizations.PERSON_ID + "=" + contact.getInt("id");
+		Cursor cursor = mParent.managedQuery(Organizations.CONTENT_URI, null, where, null,
+				null);
+
+		int isPrimaryColumn = cursor.getColumnIndex(Organizations.ISPRIMARY);
+		int labelColumn = cursor.getColumnIndex(Organizations.LABEL);
+		int typeColumn = cursor.getColumnIndex(Organizations.TYPE);
+		int companyColumn = cursor.getColumnIndex(Organizations.COMPANY);
+		int titleColumn = cursor.getColumnIndex(Organizations.TITLE);
+		JSONArray organizations = new JSONArray();
+
+		if (cursor.moveToFirst()) {
+			do {
+				JSONObject org = new JSONObject();
+				org.put("is_primary",
+						(cursor.getInt(isPrimaryColumn) != 0));
+				org.put("label", cursor.getString(labelColumn));
+				org.put("title", cursor.getString(titleColumn));
+				org.put("company", cursor.getString(companyColumn));
+				org.put("type", cursor.getString(typeColumn));
+				organizations.put(org);
+			} while (cursor.moveToNext());
+		}
+		contact.put("organizations", organizations);
+
 	}
+	
 }
 

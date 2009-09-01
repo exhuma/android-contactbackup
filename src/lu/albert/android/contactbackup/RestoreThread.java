@@ -1,7 +1,6 @@
 package lu.albert.android.contactbackup;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,8 +13,6 @@ import org.json.JSONObject;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,7 +20,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Contacts;
 import android.provider.Contacts.People;
-import android.provider.Contacts.Photos;
 
 /**
  * The thread which reads the input file and restores the contacts.
