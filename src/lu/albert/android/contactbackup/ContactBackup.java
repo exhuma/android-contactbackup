@@ -61,6 +61,9 @@ public class ContactBackup extends Activity {
 	/** The preferences name */
 	public static final String PREFS_NAME = "lu.albert.android.contactbackup.prefs";
 
+	/** The tag used in the logging facility */
+	public static final String TAG = "ContactBackup";
+
 	private Button mBackupButton;
 	private Button mRestoreButton;
 	private BackupThread progressThread;

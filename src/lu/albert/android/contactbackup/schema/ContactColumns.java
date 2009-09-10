@@ -1,8 +1,7 @@
 package lu.albert.android.contactbackup.schema;
 
 /**
- * This class defines the key names as used in the JSON dump. This gives us
- * greater flexibility for the future and avoids typos in the code
+ * This class defines the key names as used in the JSON dump.
  * 
  * @author Michel Albert <michel@albert.lu>
  */

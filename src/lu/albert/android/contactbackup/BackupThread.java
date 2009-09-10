@@ -119,8 +119,9 @@ public class BackupThread extends Thread {
 
 			do {
 				int id = managedCursor.getInt(idColumn);
-				System.out.println("Dumping "
-						+ managedCursor.getString(displayNameColumn));
+				Log.i(ContactBackup.TAG, String.format(
+						"Dumping %s",
+						managedCursor.getString(displayNameColumn)));
 
 				JSONObject contact = new JSONObject();
 				try {
@@ -149,8 +150,8 @@ public class BackupThread extends Thread {
 //								.getString(photoVersionColumn));
 //					} catch (IllegalStateException e) {
 //						contact.put(ContactColumns.PHOTO_VERSION, null);
-//						System.err
-//								.println("Unable to retrieve photo_version for contact #"
+//						Log.e(ContactBackup.TAG, 
+//								"Unable to retrieve photo_version for contact #"
 //										+ id);
 //					}
 
@@ -173,9 +174,8 @@ public class BackupThread extends Thread {
 					 */
 					writer.flush();
 				} catch (JSONException e1) {
-					System.err
-							.println("Unable to encode JSON for contact #"
-									+ id + ":" + e1.getMessage());
+					Log.e(ContactBackup.TAG, String.format(
+							"Unable to encode JSON for contact #%d (%s)", id, e1.getMessage()));
 				} catch (IOException e) {
 					// TODO: User friendly error
 				}
@@ -199,7 +199,7 @@ public class BackupThread extends Thread {
 			file_stream.close();
 		} catch (IOException e) {
 			// TODO: User friendly error
-			System.err.println("ERROR: " + e.getMessage());
+			Log.e(ContactBackup.TAG, "ERROR: " + e.getMessage());
 		}
 
 	}

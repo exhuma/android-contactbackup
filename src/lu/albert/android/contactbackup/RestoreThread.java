@@ -241,7 +241,6 @@ public class RestoreThread extends Thread{
 			if (photo != null && !photo.equals("") ){
 				try {
 					Contacts.People.setPhotoData(cr, uri, Base64.decode(photo));
-					System.out.println( "Added photo to " + uri );
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
