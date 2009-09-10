@@ -24,6 +24,7 @@ import android.provider.Contacts.Organizations;
 import android.provider.Contacts.People;
 import android.provider.Contacts.Phones;
 import android.provider.Contacts.Photos;
+import android.util.Log;
 
 /**
  * The thread which stores the contacts into a text-file on-disk
@@ -71,7 +72,8 @@ public class BackupThread extends Thread {
 		} catch (FileNotFoundException e2) {
 			// file has just been successfully created. It's there alright!
 		}
-		BufferedOutputStream stream_buffer = new BufferedOutputStream(file_stream);
+		
+		BufferedOutputStream stream_buffer = new BufferedOutputStream(file_stream, 1000*managedCursor.getCount());
 		OutputStreamWriter writer = new OutputStreamWriter(stream_buffer);
 
 		/*
@@ -88,7 +90,7 @@ public class BackupThread extends Thread {
 			// TODO User-friendly error message
 			return;
 		}
-
+		
 		if (managedCursor.moveToFirst()) {
 
 			/*
@@ -106,8 +108,8 @@ public class BackupThread extends Thread {
 			int notesColumn = managedCursor.getColumnIndex(People.NOTES);
 			int phoneticNameColumn = managedCursor
 					.getColumnIndex(People.PHONETIC_NAME);
-			int photoVersionColumn = managedCursor
-					.getColumnIndex(People.PHOTO_VERSION);
+//			int photoVersionColumn = managedCursor
+//					.getColumnIndex(People.PHOTO_VERSION);
 			int sendToVoiceMailColumn = managedCursor
 					.getColumnIndex(People.SEND_TO_VOICEMAIL);
 			int starredColumn = managedCursor
@@ -141,15 +143,16 @@ public class BackupThread extends Thread {
 							.getString(starredColumn));
 					contact.put(ContactColumns.TIMES_CONTACTED, managedCursor
 							.getString(timesContactedColumn));
-					try {
-						contact.put(ContactColumns.PHOTO_VERSION, managedCursor
-								.getString(photoVersionColumn));
-					} catch (IllegalStateException e) {
-						contact.put(ContactColumns.PHOTO_VERSION, null);
-						System.err
-								.println("Unable to retrieve photo_version for contact #"
-										+ id);
-					}
+//       Seems buggy...
+//					try {
+//						contact.put(ContactColumns.PHOTO_VERSION, managedCursor
+//								.getString(photoVersionColumn));
+//					} catch (IllegalStateException e) {
+//						contact.put(ContactColumns.PHOTO_VERSION, null);
+//						System.err
+//								.println("Unable to retrieve photo_version for contact #"
+//										+ id);
+//					}
 
 					this.appendContactMethods(contact);
 					this.appendPhotos(contact);
@@ -166,7 +169,7 @@ public class BackupThread extends Thread {
 
 					/*
 					 * we flush after each contact. That should keep memory
-					 * consumption to a minimum
+					 * consumption to a minimum.
 					 */
 					writer.flush();
 				} catch (JSONException e1) {
@@ -187,7 +190,7 @@ public class BackupThread extends Thread {
 			} while (managedCursor.moveToNext());
 
 		}
-
+		
 		try {
 			/* Add the closing "]" (JSON array grammar) */
 			writer.write("]\n");
@@ -244,6 +247,9 @@ public class BackupThread extends Thread {
 		}
 		
 		contact.put( ContactColumns.PHOTOS, photos);
+		
+		cursor.close();
+		
 	}
 	
 	/**
@@ -297,6 +303,8 @@ public class BackupThread extends Thread {
 		
 		contact.put(ContactColumns.CONTACT_METHODS, contactMethods);
 		
+		cursor.close();
+
 	}
 
 	/**
@@ -344,8 +352,9 @@ public class BackupThread extends Thread {
 				} while (cursor.moveToNext());
 			}
 		}
-		
 		contact.put(ContactColumns.PHONE_NUMBERS, phonenumbers);
+
+		cursor.close();
 
 	}
 
@@ -396,6 +405,8 @@ public class BackupThread extends Thread {
 		}
 		
 		contact.put(ContactColumns.ORGANIZATIONS, organizations);
+
+		cursor.close();
 
 	}
 	
