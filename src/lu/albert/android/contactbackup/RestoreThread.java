@@ -82,7 +82,7 @@ public class RestoreThread extends Thread{
 	 */
 	private void readStream(File in_file) {
 		
-		StringBuffer data = new StringBuffer();
+		StringBuilder data = new StringBuilder();
 		FileInputStream file_stream = null;
 		JSONObject contact = null;
 		
@@ -108,7 +108,7 @@ public class RestoreThread extends Thread{
 				if (theChar == '{') {
 					if (braceDepth == 0) {
 						contactOpen = true;
-						data = new StringBuffer();
+						data = new StringBuilder();
 					}
 					braceDepth += 1;
 				} else if (theChar == '}') {
@@ -186,7 +186,7 @@ public class RestoreThread extends Thread{
 	}
 
 	/**
-	 * Create a new contact on the device
+	 * Create a new contact on the device given a JSON object
 	 * 
 	 * @param contact The contact to be created
 	 * @throws JSONException when unable to decode the JSON elements
