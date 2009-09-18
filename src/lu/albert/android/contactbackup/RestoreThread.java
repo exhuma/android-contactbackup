@@ -43,6 +43,7 @@ public class RestoreThread extends Thread{
 	int mState;
 	int total;
 	private ContactBackup mParent;
+	private boolean mKeepRunning;
 
 	/**
 	 * Constructor
@@ -53,6 +54,7 @@ public class RestoreThread extends Thread{
 	RestoreThread(Handler dialog_handler, ContactBackup parent ) {
 		mRestoreHandler = dialog_handler;
 		mParent = parent;
+		mKeepRunning = true;
 	}
 
 	/**
@@ -108,6 +110,9 @@ public class RestoreThread extends Thread{
 				if (theChar == '{') {
 					if (braceDepth == 0) {
 						contactOpen = true;
+						if ( !mKeepRunning ){
+							break;
+						}
 						data = new StringBuilder();
 					}
 					braceDepth += 1;
@@ -256,6 +261,13 @@ public class RestoreThread extends Thread{
 		b.putString("message", message);
 		msg.setData(b);
 		mRestoreHandler.sendMessage(msg);
+	}
+
+	/**
+	 * Finish up the current contact and exit
+	 */
+	public void finish() {
+		mKeepRunning = false;
 	}
 }
 

@@ -358,6 +358,24 @@ public class ContactBackup extends Activity {
 
 		return dialog;
 	}
+	
+	@Override
+	protected void onPause() {
+		try {
+			if (mProgressThread != null && mProgressThread.isAlive()) {
+				mProgressThread.finish();
+				mProgressThread.join();
+			}
+			if (mRestoreThread != null && mRestoreThread.isAlive()) {
+				mRestoreThread.finish();
+				mRestoreThread.join();
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		super.onPause();
+	}
 
 	/**
 	 * Delete the dump file

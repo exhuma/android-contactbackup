@@ -39,6 +39,7 @@ public class BackupThread extends Thread {
 	int mState;
 	int total;
 	ContactBackup mParent;
+	private boolean mKeepRunning;
 
 	/**
 	 * Constructor
@@ -49,6 +50,7 @@ public class BackupThread extends Thread {
 	BackupThread(Handler dialog_handler, ContactBackup parent) {
 		mHandler = dialog_handler;
 		mParent = parent;
+		mKeepRunning = true;
 	}
 
 	public void run() {
@@ -187,7 +189,7 @@ public class BackupThread extends Thread {
 				msg.setData(b);
 				mHandler.sendMessage(msg);
 
-			} while (managedCursor.moveToNext());
+			} while (mKeepRunning && managedCursor.moveToNext());
 
 		}
 		
@@ -408,6 +410,13 @@ public class BackupThread extends Thread {
 
 		cursor.close();
 
+	}
+
+	/**
+	 * Finish dumping the current contact and exit
+	 */
+	public void finish() {
+		mKeepRunning = false;
 	}
 	
 }
