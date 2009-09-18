@@ -386,22 +386,6 @@ public class ContactBackup extends Activity {
 	}
 
 	/**
-	 * Create a new contacts backup file The file will appear on the external
-	 * storage device (SDCard) as FILE_NAME
-	 */
-	public void startBackup() {
-
-		File file1 = null;
-		file1 = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
-		if (file1.exists()) {
-			showDialog(DIALOG_CONFIRM_OVERWRITE);
-		} else {
-			showDialog(DIALOG_BACKUP_PROGRESS);
-		}
-
-	}
-
-	/**
 	 * @return The text contained in res/raw/eula.txt
 	 */
 	private String getEula(){
