@@ -6,7 +6,7 @@
     <string name="serializing">Serializing...</string>
     <string name="operation_finished">Operation finished.</string>
     <string name="cancelled_by_user_request">Cancelled by user request.</string>
-    <string name="app_name">Contact Backup</string>
+    <string name="app_name">JSON Backup</string>
 	<string name="menu_start">Start backup</string>
 	<string name="menu_delete_json">Delete JSON file</string>
 	<string name="restore_button">Restore from file</string>
