@@ -46,6 +46,7 @@ public class ContactBackup extends Activity {
 	private static final int DIALOG_EULA = 6;
 	private static final int DIALOG_LICENSE = 7;
 	private static final int DIALOG_USAGE = 8;
+	private static final int DIALOG_CONFIRM_RESTORE = 9;
 	
 	protected static final int RESTORE_MSG_PROGRESS = 0;
 	protected static final int RESTORE_MSG_INFO = 1;
@@ -190,6 +191,38 @@ public class ContactBackup extends Activity {
 		AlertDialog.Builder builder;
 
 		switch (id) {
+		case DIALOG_CONFIRM_RESTORE:
+			/*
+			 * Create a dialog which asks the user if the restoration should be
+			 * done (will delete all contacts)
+			 */
+			builder = new AlertDialog.Builder(this);
+			
+			builder.setMessage(getString(R.string.confirm_restore_contacts))
+					.setCancelable(false)
+					.setPositiveButton(getString(android.R.string.yes),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int id) {
+								File file1 = null;
+								file1 = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
+								if (file1.exists()) {
+									showDialog(DIALOG_RESTORE_PROGRESS);
+								}
+							}
+						})
+					// XXX: This string resolves to "cancel". I'm hoping it will be fixed in a future SDK release, so I'll leave that here.
+					.setNegativeButton(getString(android.R.string.no),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int id) {
+								showDialog(DIALOG_CANCELLED);
+								dialog.cancel();
+							}
+						});
+			dialog = builder.create();
+			break;
+
 		case DIALOG_CONFIRM_OVERWRITE:
 			/*
 			 * Create a dialog which asks the user if the existing file should
@@ -489,12 +522,7 @@ public class ContactBackup extends Activity {
 				showDialog(DIALOG_ERROR);
 				return;
 			}
-			
-			File file1 = null;
-			file1 = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
-			if (file1.exists()) {
-				showDialog(DIALOG_RESTORE_PROGRESS);
-			}
+			showDialog(DIALOG_CONFIRM_RESTORE);
 		}
 		
 	}
