@@ -66,9 +66,9 @@ public class ContactBackup extends Activity {
 
 	private Button mBackupButton;
 	private Button mRestoreButton;
-	private BackupThread progressThread;
-	private RestoreThread restoreThread;
-	private ProgressDialog progressDialog;
+	private BackupThread mProgressThread;
+	private RestoreThread mRestoreThread;
+	private ProgressDialog mProgressDialog;
 	private AlertDialog mErrorDialog;
 
 	/**
@@ -79,12 +79,12 @@ public class ContactBackup extends Activity {
 		public void handleMessage(Message msg) {
 			int position = msg.getData().getInt("position");
 			int total = msg.getData().getInt("total");
-			progressDialog.setProgress(position);
-			progressDialog.setIndeterminate(false);
-			progressDialog.setMax(total);
+			mProgressDialog.setProgress(position);
+			mProgressDialog.setIndeterminate(false);
+			mProgressDialog.setMax(total);
 			if (position >= total) {
 				dismissDialog(DIALOG_BACKUP_PROGRESS);
-				progressThread.setState(BackupThread.STATE_DONE);
+				mProgressThread.setState(BackupThread.STATE_DONE);
 				showDialog(DIALOG_FINISHED);
 			}
 		}
@@ -101,12 +101,12 @@ public class ContactBackup extends Activity {
 			case RESTORE_MSG_PROGRESS:
 				long position = msg.getData().getLong("position");
 				long total = msg.getData().getLong("total");
-				progressDialog.setProgress((int)position);
-				progressDialog.setIndeterminate(false);
-				progressDialog.setMax((int)total);
+				mProgressDialog.setProgress((int)position);
+				mProgressDialog.setIndeterminate(false);
+				mProgressDialog.setMax((int)total);
 				if (position >= total) {
 					dismissDialog(DIALOG_RESTORE_PROGRESS);
-					restoreThread.setState(BackupThread.STATE_DONE);
+					mRestoreThread.setState(BackupThread.STATE_DONE);
 					showDialog(DIALOG_FINISHED);
 				}
 				break;
@@ -117,7 +117,7 @@ public class ContactBackup extends Activity {
 				break;
 			case RESTORE_MSG_INFO:
 				String name = msg.getData().getString("name");
-				progressDialog.setMessage( "Restored " + name );
+				mProgressDialog.setMessage( "Restored " + name );
 				break;
 			default:
 				// do nothing
@@ -259,26 +259,26 @@ public class ContactBackup extends Activity {
 			/*
 			 * Display the backup progress
 			 */
-			progressDialog = new ProgressDialog(ContactBackup.this);
-			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			progressDialog.setMessage(getString(R.string.serializing));
-			progressThread = new BackupThread(dumpHandler, this);
-			progressDialog.setIndeterminate(true);
-			progressThread.start();
-			dialog = progressDialog;
+			mProgressDialog = new ProgressDialog(ContactBackup.this);
+			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			mProgressDialog.setMessage(getString(R.string.serializing));
+			mProgressThread = new BackupThread(dumpHandler, this);
+			mProgressDialog.setIndeterminate(true);
+			mProgressThread.start();
+			dialog = mProgressDialog;
 			break;
 
 		case DIALOG_RESTORE_PROGRESS:
 			/*
 			 * Display the restoration progress
 			 */
-			progressDialog = new ProgressDialog(ContactBackup.this);
-			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			progressDialog.setMessage(getString(R.string.restoring));
-			restoreThread = new RestoreThread(restore_handler, this);
-			progressDialog.setIndeterminate(true);
-			restoreThread.start();
-			dialog = progressDialog;
+			mProgressDialog = new ProgressDialog(ContactBackup.this);
+			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			mProgressDialog.setMessage(getString(R.string.restoring));
+			mRestoreThread = new RestoreThread(restore_handler, this);
+			mProgressDialog.setIndeterminate(true);
+			mRestoreThread.start();
+			dialog = mProgressDialog;
 			break;
 			
 		case DIALOG_ERROR:
