@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -44,9 +45,10 @@ public class ContactBackup extends Activity {
 	private static final int DIALOG_RESTORE_PROGRESS = 4;
 	private static final int DIALOG_ERROR = 5;
 	private static final int DIALOG_EULA = 6;
-	private static final int DIALOG_LICENSE = 7;
 	private static final int DIALOG_USAGE = 8;
 	private static final int DIALOG_CONFIRM_RESTORE = 9;
+
+	private static int ACTIVITY_VIEW_LICENSE = 0;
 	
 	protected static final int RESTORE_MSG_PROGRESS = 0;
 	protected static final int RESTORE_MSG_INFO = 1;
@@ -145,7 +147,8 @@ public class ContactBackup extends Activity {
 	    	showDialog( DIALOG_EULA );
 	        return true;
 	    case MENU_LICENSE:
-	    	showDialog( DIALOG_LICENSE );
+	    	Intent i = new Intent(this, LicenseViewer.class);
+	    	startActivityForResult(i, ACTIVITY_VIEW_LICENSE );
 	        return true;
 	    case MENU_USAGE:
 	    	showDialog( DIALOG_USAGE );
@@ -350,22 +353,6 @@ public class ContactBackup extends Activity {
 			dialog = builder.create();
 			break;
 			
-		case DIALOG_LICENSE:
-			/*
-			 * Display the License
-			 */
-			builder = new AlertDialog.Builder(ContactBackup.this);
-			builder.setMessage(getLicense())
-					.setCancelable(false)
-					.setNegativeButton(getString(android.R.string.ok),
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-							}
-						});
-			dialog = builder.create();
-			break;
-			
 		case DIALOG_USAGE:
 			/*
 			 * Display the Usage
@@ -438,26 +425,6 @@ public class ContactBackup extends Activity {
 		return content.toString();
 	}
 	
-	/**
-	 * @return The text contained in res/raw/license.txt
-	 */
-	private String getLicense(){
-		InputStream license_stream = getResources().openRawResource(R.raw.license);
-		StringBuffer content = new StringBuffer();
-		int result;
-		try {
-			result = license_stream.read();
-			while ( result != -1 ){
-				content.append((char)result);
-				result = license_stream.read();
-			}
-		} catch (IOException e) {
-			mErrorDialog.setMessage("Unable to open the license file!");
-			showDialog(DIALOG_ERROR);
-		}
-		return content.toString();
-	}
-
 	/**
 	 * @return The text contained in res/raw/license.txt
 	 */

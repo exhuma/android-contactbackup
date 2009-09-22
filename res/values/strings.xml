@@ -13,4 +13,5 @@
 	<string name="backup_button">Save to file</string>
 	<string name="file_exists">"File %s exists. Do you want to overwrite it?"</string>
 	<string name="confirm_restore_contacts">"Do you really want to *replace* the current contacts with those in the file? This operation cannot be undone!"</string>
+	<string name="html_view_title">"Document Viewer"</string>
 </resources>
