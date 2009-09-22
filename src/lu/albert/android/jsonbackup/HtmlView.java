@@ -16,7 +16,7 @@ import android.webkit.WebView;
 public class HtmlView extends Activity {
 
 	/** Key that points to the document which is loaded in the HTML view */
-	public static final String KEY_DOC_ID = "lu.albert.jsonbackup.html_doc_id";
+	public static final String KEY_DOC_ID = "lu.albert.android.jsonbackup.html_doc_id";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
