@@ -1,9 +1,8 @@
-package lu.albert.android.contactbackup;
+package lu.albert.android.jsonbackup;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -62,7 +61,7 @@ public class ContactBackup extends Activity {
 	public static final int RESTORE_SHOW_ERROR = 2;
 	
 	/** The preferences name */
-	public static final String PREFS_NAME = "lu.albert.android.contactbackup.prefs";
+	public static final String PREFS_NAME = "lu.albert.android.jsonbackup.prefs";
 
 	/** The tag used in the logging facility */
 	public static final String TAG = "ContactBackup";

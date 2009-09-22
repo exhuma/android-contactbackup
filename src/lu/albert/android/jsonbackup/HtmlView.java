@@ -1,8 +1,7 @@
-package lu.albert.android.contactbackup;
+package lu.albert.android.jsonbackup;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;

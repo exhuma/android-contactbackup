@@ -1,4 +1,4 @@
-package lu.albert.android.contactbackup;
+package lu.albert.android.jsonbackup;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import lu.albert.android.contactbackup.schema.ContactColumns;
+import lu.albert.android.jsonbackup.schema.ContactColumns;
 
 import org.json.JSONArray;
 import org.json.JSONException;

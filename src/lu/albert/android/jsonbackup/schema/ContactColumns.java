@@ -1,4 +1,4 @@
-package lu.albert.android.contactbackup.schema;
+package lu.albert.android.jsonbackup.schema;
 
 /**
  * This class defines the key names as used in the JSON dump.

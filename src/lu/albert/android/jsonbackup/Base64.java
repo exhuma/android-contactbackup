@@ -1,4 +1,4 @@
-package lu.albert.android.contactbackup;
+package lu.albert.android.jsonbackup;
 
 /**
  * <p>Encodes and decodes to and from Base64 notation.</p>
