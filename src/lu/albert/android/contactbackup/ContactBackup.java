@@ -235,8 +235,6 @@ public class ContactBackup extends Activity {
 			 * Create a dialog which asks the user if the existing file should
 			 * be overwritten (it will be deleted before the new one is 
 			 * created)
-			 * 
-			 * TODO: create a temporary file and move it to the destination file on success. To prevent data corruption
 			 */
 			builder = new AlertDialog.Builder(this);
 			
@@ -395,8 +393,7 @@ public class ContactBackup extends Activity {
 				mRestoreThread.join();
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// Thread already dead. We can ignore this... I hope.
 		}
 		super.onPause();
 	}

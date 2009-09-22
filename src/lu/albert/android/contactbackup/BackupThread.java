@@ -54,6 +54,7 @@ public class BackupThread extends Thread {
 	}
 
 	public void run() {
+		// TODO: create a temporary file and move it to the destination file on success. To prevent data corruption
 		Cursor managedCursor = mParent.managedQuery(People.CONTENT_URI, null,
 				null,
 				null,

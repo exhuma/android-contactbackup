@@ -42,8 +42,9 @@ public class HtmlView extends Activity {
 				result = license_stream.read();
 			}
 		} catch (IOException e) {
-			// TODO: handle exception
 			Log.e(this.getClass().getCanonicalName(), e.getMessage());
+			content.append( "Unable to read the file. Error message was:\n" );
+			content.append( e.getMessage() );
 		}
 		view.loadData(content.toString(), "text/html", "UTF-8");
 		if ( view.getTitle() != null ){
