@@ -42,7 +42,7 @@ public class RestoreThread extends Thread{
 	final static int STATE_RUNNING = 1;
 	int mState;
 	int total;
-	private ContactBackup mParent;
+	private JsonBackup mParent;
 	private boolean mKeepRunning;
 
 	/**
@@ -51,7 +51,7 @@ public class RestoreThread extends Thread{
 	 * @param dialog_handler A handler which is used to communicate with the progress dialog
 	 * @param parent The main Activity (UI) class
 	 */
-	RestoreThread(Handler dialog_handler, ContactBackup parent ) {
+	RestoreThread(Handler dialog_handler, JsonBackup parent ) {
 		mRestoreHandler = dialog_handler;
 		mParent = parent;
 		mKeepRunning = true;
@@ -70,7 +70,7 @@ public class RestoreThread extends Thread{
 		mParent.getContentResolver().delete(People.CONTENT_URI, null, null);
 		File file1 = null;
 		file1 = new File(Environment.getExternalStorageDirectory(),
-				ContactBackup.FILE_NAME);
+				JsonBackup.FILE_NAME);
 		
 		this.readStream(file1);
 		
@@ -135,7 +135,7 @@ public class RestoreThread extends Thread{
 					store_contact( contact );
 					contactOpen = false;
 					
-					Message msg = mRestoreHandler.obtainMessage(ContactBackup.RESTORE_MSG_INFO);
+					Message msg = mRestoreHandler.obtainMessage(JsonBackup.RESTORE_MSG_INFO);
 					Bundle b = new Bundle();
 					b.putString("name", contact.getString( ContactColumns.NAME ));
 					msg.setData(b);
@@ -149,7 +149,7 @@ public class RestoreThread extends Thread{
 				 * Update the progress dialog
 				 */
 				if ( count % 100 == 0) {
-					Message msg = mRestoreHandler.obtainMessage(ContactBackup.RESTORE_MSG_PROGRESS);
+					Message msg = mRestoreHandler.obtainMessage(JsonBackup.RESTORE_MSG_PROGRESS);
 					Bundle b = new Bundle();
 					b.putLong("position", count);
 					b.putLong("total", in_file.length());
@@ -165,7 +165,7 @@ public class RestoreThread extends Thread{
 			 * often, it could happen that the value does not meet the EOL
 			 * criteria.
 			 */
-			Message msg = mRestoreHandler.obtainMessage(ContactBackup.RESTORE_MSG_PROGRESS);
+			Message msg = mRestoreHandler.obtainMessage(JsonBackup.RESTORE_MSG_PROGRESS);
 			Bundle b = new Bundle();
 			b.putLong("position", in_file.length());
 			b.putLong("total", in_file.length());
@@ -256,7 +256,7 @@ public class RestoreThread extends Thread{
 	}
 	
 	private void showError( String message ){
-		Message msg = mRestoreHandler.obtainMessage(ContactBackup.RESTORE_SHOW_ERROR);
+		Message msg = mRestoreHandler.obtainMessage(JsonBackup.RESTORE_SHOW_ERROR);
 		Bundle b = new Bundle();
 		b.putString("message", message);
 		msg.setData(b);

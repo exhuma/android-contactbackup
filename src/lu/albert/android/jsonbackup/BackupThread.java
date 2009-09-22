@@ -38,7 +38,7 @@ public class BackupThread extends Thread {
 	final static int STATE_RUNNING = 1;
 	int mState;
 	int total;
-	ContactBackup mParent;
+	JsonBackup mParent;
 	private boolean mKeepRunning;
 
 	/**
@@ -47,7 +47,7 @@ public class BackupThread extends Thread {
 	 * @param dialog_handler A handler which is used to communicate with the progress dialog
 	 * @param parent The main Activity (UI) class
 	 */
-	BackupThread(Handler dialog_handler, ContactBackup parent) {
+	BackupThread(Handler dialog_handler, JsonBackup parent) {
 		mHandler = dialog_handler;
 		mParent = parent;
 		mKeepRunning = true;
@@ -63,7 +63,7 @@ public class BackupThread extends Thread {
 		File backup_file = null;
 		try {
 			backup_file = new File(Environment.getExternalStorageDirectory(),
-					ContactBackup.FILE_NAME);
+					JsonBackup.FILE_NAME);
 			backup_file.createNewFile();
 		} catch (IOException e) {
 			// TODO: user-friendly error message
@@ -122,7 +122,7 @@ public class BackupThread extends Thread {
 
 			do {
 				int id = managedCursor.getInt(idColumn);
-				Log.i(ContactBackup.TAG, String.format(
+				Log.i(JsonBackup.TAG, String.format(
 						"Dumping %s",
 						managedCursor.getString(displayNameColumn)));
 
@@ -153,7 +153,7 @@ public class BackupThread extends Thread {
 //								.getString(photoVersionColumn));
 //					} catch (IllegalStateException e) {
 //						contact.put(ContactColumns.PHOTO_VERSION, null);
-//						Log.e(ContactBackup.TAG, 
+//						Log.e(JsonBackup.TAG, 
 //								"Unable to retrieve photo_version for contact #"
 //										+ id);
 //					}
@@ -177,7 +177,7 @@ public class BackupThread extends Thread {
 					 */
 					writer.flush();
 				} catch (JSONException e1) {
-					Log.e(ContactBackup.TAG, String.format(
+					Log.e(JsonBackup.TAG, String.format(
 							"Unable to encode JSON for contact #%d (%s)", id, e1.getMessage()));
 				} catch (IOException e) {
 					// TODO: User friendly error
@@ -202,7 +202,7 @@ public class BackupThread extends Thread {
 			file_stream.close();
 		} catch (IOException e) {
 			// TODO: User friendly error
-			Log.e(ContactBackup.TAG, "ERROR: " + e.getMessage());
+			Log.e(JsonBackup.TAG, "ERROR: " + e.getMessage());
 		}
 
 	}

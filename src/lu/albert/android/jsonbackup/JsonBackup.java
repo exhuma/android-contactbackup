@@ -28,7 +28,7 @@ import android.widget.Button;
  * 
  * @author Michel Albert <michel@albert.lu>
  */
-public class ContactBackup extends Activity {
+public class JsonBackup extends Activity {
 
 	/** The filename that will be stored on disk */
 	public static final String FILE_NAME = "contacts.json";
@@ -64,7 +64,7 @@ public class ContactBackup extends Activity {
 	public static final String PREFS_NAME = "lu.albert.android.jsonbackup.prefs";
 
 	/** The tag used in the logging facility */
-	public static final String TAG = "ContactBackup";
+	public static final String TAG = "JsonBackup";
 
 	private Button mBackupButton;
 	private Button mRestoreButton;
@@ -175,7 +175,7 @@ public class ContactBackup extends Activity {
 		mRestoreButton = (Button)findViewById(R.id.restore_button);
 		mRestoreButton.setOnClickListener( new RestoreListener() );
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(ContactBackup.this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(JsonBackup.this);
 		builder.setTitle(getString(R.string.error))
 				.setMessage(getString(R.string.unspecified_error))
 				.setCancelable(false)
@@ -244,7 +244,7 @@ public class ContactBackup extends Activity {
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int id) {
-								ContactBackup.this.deleteDump();
+								JsonBackup.this.deleteDump();
 								showDialog(DIALOG_BACKUP_PROGRESS);
 							}
 						})
@@ -280,7 +280,7 @@ public class ContactBackup extends Activity {
 			/*
 			 * Tell the user that the operation finished as expected
 			 */
-			builder = new AlertDialog.Builder(ContactBackup.this);
+			builder = new AlertDialog.Builder(JsonBackup.this);
 			builder.setMessage(getString(R.string.operation_finished))
 					.setCancelable(false)
 					.setNegativeButton(getString(android.R.string.ok),
@@ -296,7 +296,7 @@ public class ContactBackup extends Activity {
 			/*
 			 * Display the backup progress
 			 */
-			mProgressDialog = new ProgressDialog(ContactBackup.this);
+			mProgressDialog = new ProgressDialog(JsonBackup.this);
 			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			mProgressDialog.setMessage(getString(R.string.serializing));
 			mProgressThread = new BackupThread(dumpHandler, this);
@@ -309,7 +309,7 @@ public class ContactBackup extends Activity {
 			/*
 			 * Display the restoration progress
 			 */
-			mProgressDialog = new ProgressDialog(ContactBackup.this);
+			mProgressDialog = new ProgressDialog(JsonBackup.this);
 			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			mProgressDialog.setMessage(getString(R.string.restoring));
 			mRestoreThread = new RestoreThread(restore_handler, this);
@@ -329,7 +329,7 @@ public class ContactBackup extends Activity {
 			/*
 			 * Display the EULA on first start
 			 */
-			builder = new AlertDialog.Builder(ContactBackup.this);
+			builder = new AlertDialog.Builder(JsonBackup.this);
 			builder.setMessage(getEula())
 					.setCancelable(false)
 					.setPositiveButton(getString(android.R.string.yes), 
@@ -358,7 +358,7 @@ public class ContactBackup extends Activity {
 			/*
 			 * Display the Usage
 			 */
-			builder = new AlertDialog.Builder(ContactBackup.this);
+			builder = new AlertDialog.Builder(JsonBackup.this);
 			builder.setMessage(getUsage())
 					.setCancelable(false)
 					.setNegativeButton(getString(android.R.string.ok),

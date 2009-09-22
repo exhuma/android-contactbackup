@@ -49,7 +49,7 @@ public class HtmlView extends Activity {
 		if ( view.getTitle() != null ){
 			setTitle(view.getTitle());
 		} else {
-			setTitle( "unknown doc " );
+			setTitle( R.string.html_view_title );
 		}
 	}
 	
