@@ -142,16 +142,20 @@ public class ContactBackup extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent intent;
 	    switch (item.getItemId()) {
 	    case MENU_EULA:
 	    	showDialog( DIALOG_EULA );
 	        return true;
 	    case MENU_LICENSE:
-	    	Intent i = new Intent(this, LicenseViewer.class);
-	    	startActivityForResult(i, ACTIVITY_VIEW_LICENSE );
+	    	intent = new Intent(this, HtmlView.class);
+	    	intent.putExtra(HtmlView.KEY_DOC_ID, R.raw.gpl3);
+	    	startActivityForResult(intent, ACTIVITY_VIEW_LICENSE );
 	        return true;
 	    case MENU_USAGE:
-	    	showDialog( DIALOG_USAGE );
+	    	intent = new Intent(this, HtmlView.class);
+	    	intent.putExtra(HtmlView.KEY_DOC_ID, R.raw.usage);
+	    	startActivityForResult(intent, ACTIVITY_VIEW_LICENSE );
 	        return true;
 	    }
 	    return false;

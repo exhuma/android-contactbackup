@@ -14,18 +14,25 @@ import android.webkit.WebView;
  * 
  * @author exhuma
  */
-public class LicenseViewer extends Activity {
-	
+public class HtmlView extends Activity {
+
+	/** Key that points to the document which is loaded in the HTML view */
+	public static final String KEY_DOC_ID = "lu.albert.jsonbackup.html_doc_id";
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.html_view);
-		loadDocument();
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			int docId = extras.getInt(KEY_DOC_ID);
+			loadDocument( docId );
+		}
 	}
 
-	private void loadDocument() {
+	private void loadDocument(int docId) {
 		WebView view = (WebView)findViewById(R.id.webview);
-		InputStream license_stream = getResources().openRawResource(R.raw.gpl3);
+		InputStream license_stream = getResources().openRawResource(docId);
 		StringBuilder content = new StringBuilder();
 		int result;
 		try {
@@ -39,6 +46,11 @@ public class LicenseViewer extends Activity {
 			Log.e(this.getClass().getCanonicalName(), e.getMessage());
 		}
 		view.loadData(content.toString(), "text/html", "UTF-8");
+		if ( view.getTitle() != null ){
+			setTitle(view.getTitle());
+		} else {
+			setTitle( "unknown doc " );
+		}
 	}
 	
 }
