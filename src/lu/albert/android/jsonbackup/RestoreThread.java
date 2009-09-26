@@ -95,7 +95,6 @@ public class RestoreThread extends Thread{
 			
 			int data_available = reader.read();
 			int braceDepth = 0; // used to trigger JSON decoding
-			// TODO: contactOpen is not necessary => contactOpen = data.length() > 0
 			boolean contactOpen = false; // used to trigger JSON decoding
 			long count = 0; // characters read
 			
@@ -131,15 +130,20 @@ public class RestoreThread extends Thread{
 				 *  been restored.
 				 */
 				if (braceDepth == 0 && contactOpen) {
-					contact = new JSONObject( data.toString() );
-					store_contact( contact );
+					try {
+						contact = new JSONObject( data.toString() );
+						store_contact( contact );
+						
+						Message msg = mRestoreHandler.obtainMessage(JsonBackup.RESTORE_MSG_INFO);
+						Bundle b = new Bundle();
+						b.putString("name", contact.getString( ContactColumns.NAME ));
+						msg.setData(b);
+						mRestoreHandler.sendMessage(msg);
+					} catch (JSONException e){
+						showError(e.getMessage());
+						e.printStackTrace();
+					}
 					contactOpen = false;
-					
-					Message msg = mRestoreHandler.obtainMessage(JsonBackup.RESTORE_MSG_INFO);
-					Bundle b = new Bundle();
-					b.putString("name", contact.getString( ContactColumns.NAME ));
-					msg.setData(b);
-					mRestoreHandler.sendMessage(msg);
 				}
 				
 				data_available = reader.read();
@@ -182,9 +186,6 @@ public class RestoreThread extends Thread{
 			showError(e.getMessage());
 			e.printStackTrace();
 		} catch (IOException e) {
-			showError(e.getMessage());
-			e.printStackTrace();
-		} catch (JSONException e) {
 			showError(e.getMessage());
 			e.printStackTrace();
 		}
