@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.webkit.WebView;
 
 /**
@@ -41,7 +40,7 @@ public class HtmlView extends Activity {
 				result = license_stream.read();
 			}
 		} catch (IOException e) {
-			Log.e(this.getClass().getCanonicalName(), e.getMessage());
+//			Log.e(this.getClass().getCanonicalName(), e.getMessage());
 			content.append( "Unable to read the file. Error message was:\n" );
 			content.append( e.getMessage() );
 		}

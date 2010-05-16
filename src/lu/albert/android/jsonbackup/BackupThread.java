@@ -24,7 +24,6 @@ import android.provider.Contacts.Organizations;
 import android.provider.Contacts.People;
 import android.provider.Contacts.Phones;
 import android.provider.Contacts.Photos;
-import android.util.Log;
 
 /**
  * The thread which stores the contacts into a text-file on-disk
@@ -122,9 +121,9 @@ public class BackupThread extends Thread {
 
 			do {
 				int id = managedCursor.getInt(idColumn);
-				Log.i(JsonBackup.TAG, String.format(
-						"Dumping %s",
-						managedCursor.getString(displayNameColumn)));
+//				Log.i(JsonBackup.TAG, String.format(
+//						"Dumping %s",
+//						managedCursor.getString(displayNameColumn)));
 
 				JSONObject contact = new JSONObject();
 				try {
@@ -177,8 +176,8 @@ public class BackupThread extends Thread {
 					 */
 					writer.flush();
 				} catch (JSONException e1) {
-					Log.e(JsonBackup.TAG, String.format(
-							"Unable to encode JSON for contact #%d (%s)", id, e1.getMessage()));
+//					Log.e(JsonBackup.TAG, String.format(
+//							"Unable to encode JSON for contact #%d (%s)", id, e1.getMessage()));
 				} catch (IOException e) {
 					// TODO: User friendly error
 				}
@@ -202,7 +201,7 @@ public class BackupThread extends Thread {
 			file_stream.close();
 		} catch (IOException e) {
 			// TODO: User friendly error
-			Log.e(JsonBackup.TAG, "ERROR: " + e.getMessage());
+//			Log.e(JsonBackup.TAG, "ERROR: " + e.getMessage());
 		}
 
 	}
