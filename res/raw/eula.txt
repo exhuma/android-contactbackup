@@ -2,7 +2,7 @@ Do you accept the following
 terms?
 -----------------------------
 
-ContactBackup is used to
+JsonBackup is used to
 create/load a JSON dump of the
 contacts stored on an Android
 OS. Copyright (C) 2009 Michel
