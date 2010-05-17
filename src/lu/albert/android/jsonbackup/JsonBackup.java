@@ -85,7 +85,7 @@ public class JsonBackup extends Activity {
 			mProgressDialog.setIndeterminate(false);
 			mProgressDialog.setMax(total);
 			if (position >= total) {
-				dismissDialog(DIALOG_BACKUP_PROGRESS);
+				removeDialog(DIALOG_BACKUP_PROGRESS);
 				mProgressThread.setState(BackupThread.STATE_DONE);
 				showDialog(DIALOG_FINISHED);
 			}
@@ -107,7 +107,7 @@ public class JsonBackup extends Activity {
 				mProgressDialog.setIndeterminate(false);
 				mProgressDialog.setMax((int)total);
 				if (position >= total) {
-					dismissDialog(DIALOG_RESTORE_PROGRESS);
+					removeDialog(DIALOG_RESTORE_PROGRESS);
 					mRestoreThread.setState(BackupThread.STATE_DONE);
 					showDialog(DIALOG_FINISHED);
 				}
