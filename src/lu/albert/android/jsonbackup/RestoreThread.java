@@ -69,8 +69,7 @@ public class RestoreThread extends Thread{
 
 		mParent.getContentResolver().delete(People.CONTENT_URI, null, null);
 		File file1 = null;
-		file1 = new File(Environment.getExternalStorageDirectory(),
-				JsonBackup.FILE_NAME);
+		file1 = new File( mParent.getStorageFolder(), JsonBackup.FILE_NAME );
 		
 		this.readStream(file1);
 		

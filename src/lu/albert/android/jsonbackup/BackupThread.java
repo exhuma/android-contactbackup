@@ -61,8 +61,7 @@ public class BackupThread extends Thread {
 		
 		File backup_file = null;
 		try {
-			backup_file = new File(Environment.getExternalStorageDirectory(),
-					JsonBackup.FILE_NAME);
+			backup_file = new File( mParent.getStorageFolder(), JsonBackup.FILE_NAME );
 			backup_file.createNewFile();
 		} catch (IOException e) {
 			// TODO: user-friendly error message

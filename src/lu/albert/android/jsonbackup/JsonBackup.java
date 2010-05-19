@@ -10,10 +10,12 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +34,9 @@ public class JsonBackup extends Activity {
 
 	/** The filename that will be stored on disk */
 	public static final String FILE_NAME = "contacts.json";
+	
+	/** The folder containing the data files */
+	public static final String DATA_FOLDER = "jsonBackup";
 	
 	private static final int MENU_EULA = Menu.FIRST;
 	private static final int MENU_LICENSE = Menu.FIRST + 1;
@@ -160,10 +165,38 @@ public class JsonBackup extends Activity {
 	    return false;
 	}
 	
+	private void upgradeHook(){
+		int versionCode = -1;
+		try {
+			versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+		} catch (NameNotFoundException e) {
+			return;
+		}
+
+		if ( versionCode <= 3 ){
+			// Create the new folder
+			File dataFolder = new File( Environment.getExternalStorageDirectory(), DATA_FOLDER );
+			dataFolder.mkdir();
+			
+			// Move the json file to the new location (if it exists)
+			File oldFile = new File( Environment.getExternalStorageDirectory(), FILE_NAME);
+			File newFile = new File( dataFolder, FILE_NAME );
+			if ( oldFile.exists() ){
+				oldFile.renameTo(newFile);
+			}
+		}
+	}
+	
+	protected File getStorageFolder(){
+		return new File( Environment.getExternalStorageDirectory(), DATA_FOLDER );
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		upgradeHook();
 		
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		if ( !settings.getBoolean("eulaAccepted", false) ){
@@ -211,7 +244,7 @@ public class JsonBackup extends Activity {
 							public void onClick(DialogInterface dialog,
 									int id) {
 								File file1 = null;
-								file1 = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
+								file1 = new File(getStorageFolder(), FILE_NAME);
 								if (file1.exists()) {
 									showDialog(DIALOG_RESTORE_PROGRESS);
 								}
@@ -401,7 +434,7 @@ public class JsonBackup extends Activity {
 	 * Delete the dump file
 	 */
 	protected void deleteDump() {
-		File fp = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
+		File fp = new File(getStorageFolder(), FILE_NAME);
 		fp.delete();
 	}
 
@@ -463,7 +496,7 @@ public class JsonBackup extends Activity {
 			}
 
 			File file1 = null;
-			file1 = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
+			file1 = new File(getStorageFolder(), FILE_NAME);
 			if (file1.exists()) {
 				showDialog(DIALOG_CONFIRM_OVERWRITE);
 			} else {
