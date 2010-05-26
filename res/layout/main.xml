@@ -24,5 +24,11 @@
 				android:layout_width="fill_parent"
 		    	android:layout_height="wrap_content" 
 			/>
+			<Button 
+				android:text="@string/delete_button"
+			    android:id="@+id/delete_button"
+				android:layout_width="fill_parent"
+		    	android:layout_height="wrap_content" 
+			/>
 	</LinearLayout>
 </ScrollView>

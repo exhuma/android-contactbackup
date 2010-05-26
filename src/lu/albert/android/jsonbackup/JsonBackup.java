@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 /**
  * Activity to create a plain-text backup of you contact list. Only the most
@@ -51,6 +52,7 @@ public class JsonBackup extends Activity {
 	private static final int DIALOG_EULA = 6;
 	private static final int DIALOG_USAGE = 8;
 	private static final int DIALOG_CONFIRM_RESTORE = 9;
+	private static final int DIALOG_CONFIRM_DELETE = 10;
 
 	private static int ACTIVITY_VIEW_LICENSE = 0;
 	
@@ -73,6 +75,7 @@ public class JsonBackup extends Activity {
 
 	private Button mBackupButton;
 	private Button mRestoreButton;
+	private Button mDeleteButton;
 	private BackupThread mProgressThread;
 	private RestoreThread mRestoreThread;
 	private ProgressDialog mProgressDialog;
@@ -207,6 +210,16 @@ public class JsonBackup extends Activity {
 		mBackupButton.setOnClickListener( new BackupListener() );
 		mRestoreButton = (Button)findViewById(R.id.restore_button);
 		mRestoreButton.setOnClickListener( new RestoreListener() );
+		mDeleteButton = (Button)findViewById(R.id.delete_button);
+		mDeleteButton.setText(getString(R.string.delete_button, FILE_NAME));
+		mDeleteButton.setOnClickListener( new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				showDialog(DIALOG_CONFIRM_DELETE);
+			}
+			
+		});
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(JsonBackup.this);
 		builder.setTitle(getString(R.string.error))
@@ -222,7 +235,7 @@ public class JsonBackup extends Activity {
 		mErrorDialog = builder.create();
 
 	}
-
+	
 	@Override
 	protected Dialog onCreateDialog(int id) {
 
@@ -230,6 +243,39 @@ public class JsonBackup extends Activity {
 		AlertDialog.Builder builder;
 
 		switch (id) {
+		case DIALOG_CONFIRM_DELETE:
+			/*
+			 * Create a dialog which asks the user if the file should be
+			 * deleted
+			 */
+			builder = new AlertDialog.Builder(this);
+			builder.setMessage(getString(R.string.confirm_delete_contacts_dump, FILE_NAME))
+					.setCancelable(false)
+					.setPositiveButton(getString(android.R.string.yes),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int id) {
+								File file1 = null;
+								file1 = new File(getStorageFolder(), FILE_NAME);
+								if (file1.exists()) {
+									if ( file1.delete() ){
+										Toast.makeText(JsonBackup.this,
+												R.string.file_successfully_deleted,
+												Toast.LENGTH_SHORT ).show();
+									}
+								}
+							}
+						})
+					// XXX: This string resolves to "cancel". I'm hoping it will be fixed in a future SDK release, so I'll leave that here.
+					.setNegativeButton(getString(android.R.string.no),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int id) {
+								dialog.cancel();
+							}
+						});
+			dialog = builder.create();
+			break;
 		case DIALOG_CONFIRM_RESTORE:
 			/*
 			 * Create a dialog which asks the user if the restoration should be
@@ -522,6 +568,13 @@ public class JsonBackup extends Activity {
 				showDialog(DIALOG_ERROR);
 				return;
 			}
+			
+			File backupFile = new File( getStorageFolder(), FILE_NAME );
+			if ( !backupFile.exists() ){
+				Toast.makeText(JsonBackup.this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
+				return;
+			}
+			
 			showDialog(DIALOG_CONFIRM_RESTORE);
 		}
 		
