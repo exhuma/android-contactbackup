@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">JSON Backup 1.1.0</string>
     <string name="unspecified_error">Unspecified error</string>
     <string name="error">Error</string>
     <string name="restoring">Restoring...</string>
     <string name="serializing">Serializing...</string>
     <string name="operation_finished">Operation finished.</string>
     <string name="cancelled_by_user_request">Cancelled by user request.</string>
-    <string name="app_name">JSON Backup</string>
 	<string name="restore_button">Restore contacts from SD-Card</string>
 	<string name="delete_button">Delete %s</string>
 	<string name="backup_button">Save contacts to SD-Card</string>
@@ -16,4 +16,5 @@
 	<string name="confirm_delete_contacts_dump">Do you really want to delete the dump file '%s'?</string>
 	<string name="file_not_found">File not found!</string>
 	<string name="file_successfully_deleted">File successfully deleted.</string>
+	<string name="restored_s">Restored %s</string>
 </resources>

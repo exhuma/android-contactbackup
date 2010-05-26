@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unspecified_error">Erreur inconnu</string>
+    <string name="error">Erreur</string>
+    <string name="restoring">Restoration en cours...</string>
+    <string name="serializing">Sauvegarde en cours...</string>
+    <string name="operation_finished">Fini!</string>
+    <string name="cancelled_by_user_request">Opération annulée!</string>
+	<string name="restore_button">Restaurer les données depuis la carte SD</string>
+	<string name="delete_button">Supprimer %s</string>
+	<string name="backup_button">Enrégistrer les contacts sur la carte SD</string>
+	<string name="file_exists">"Le fichier %s existe. Voulez vous l'écraser?"</string>
+	<string name="confirm_restore_contacts">"Vous êtes certain que vous voules *remplacer* les contacts? Ceci est impossible à annuler!"</string>
+	<string name="html_view_title">"Lecteur de documents"</string>
+	<string name="confirm_delete_contacts_dump">Voules vous supprimer le fichier '%s'?</string>
+	<string name="file_not_found">Fichier n'existe pas!</string>
+	<string name="file_successfully_deleted">Fichier supprimé.</string>
+	<string name="restored_s">Restoré %s</string>
+</resources>

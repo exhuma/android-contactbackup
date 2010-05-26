@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unspecified_error">Unbekannter Fehler</string>
+    <string name="error">Fehler</string>
+    <string name="restoring">Wiederherstellung läuft...</string>
+    <string name="serializing">Schreibvorgang läuft...</string>
+    <string name="operation_finished">Fertig!</string>
+    <string name="cancelled_by_user_request">Auf Benutzerwunsch abgebrochen.</string>
+	<string name="restore_button">Daten von SD-Karte laden</string>
+	<string name="delete_button">%s löschen</string>
+	<string name="backup_button">Kontakte auf SD-Karte speichern</string>
+	<string name="file_exists">"Die Datei %s existiert bereits. Möchten Sie diesu überschreiben?"</string>
+	<string name="confirm_restore_contacts">"Möchten Sie tatsächlich alle Kontakte des Gerätes *ersetzen*? Dies kann nicht rückgängig gemacht werden!"</string>
+	<string name="html_view_title">"Dokumentbetrachter"</string>
+	<string name="confirm_delete_contacts_dump">Möchten Sie die Datei '%s' wirklich löschen?</string>
+	<string name="file_not_found">Datei nicht gefunden!</string>
+	<string name="file_successfully_deleted">Datei erfolgreich gelöscht.</string>
+	<string name="restored_s">%s wiederhergestellt.</string>
+</resources>

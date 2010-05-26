@@ -3,6 +3,7 @@ package lu.albert.android.jsonbackup;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -15,7 +16,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -127,7 +127,7 @@ public class JsonBackup extends Activity {
 				break;
 			case RESTORE_MSG_INFO:
 				String name = msg.getData().getString("name");
-				mProgressDialog.setMessage( "Restored " + name );
+				mProgressDialog.setMessage( getString( R.string.restored_s, name ) );
 				break;
 			default:
 				// do nothing
@@ -176,9 +176,13 @@ public class JsonBackup extends Activity {
 			return;
 		}
 
-		if ( versionCode <= 3 ){
+		if ( versionCode > 3 ){
 			// Create the new folder
 			File dataFolder = new File( Environment.getExternalStorageDirectory(), DATA_FOLDER );
+			if (dataFolder.exists()){
+				// we are already up-to-date.
+				return;
+			}
 			dataFolder.mkdir();
 			
 			// Move the json file to the new location (if it exists)
